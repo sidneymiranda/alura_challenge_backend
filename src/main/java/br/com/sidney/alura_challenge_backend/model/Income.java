@@ -1,8 +1,8 @@
 package br.com.sidney.alura_challenge_backend.model;
 
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import br.com.sidney.alura_challenge_backend.dto.IncomeRequest;
+import br.com.sidney.alura_challenge_backend.utils.DateUtils;
+import lombok.*;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -10,8 +10,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@AllArgsConstructor
-@NoArgsConstructor
+@Getter
+@Setter
 @EqualsAndHashCode
 public class Income implements Serializable {
 
@@ -27,4 +27,14 @@ public class Income implements Serializable {
 
     @Column(nullable = false)
     private LocalDateTime date;
+
+    public Income() {
+
+    }
+
+    public Income(IncomeRequest request) {
+        this.description = request.getDescription();
+        this.value = new BigDecimal(request.getValue()).setScale(2);
+        this.date = DateUtils.stringToDate(request.getDate());
+    }
 }
