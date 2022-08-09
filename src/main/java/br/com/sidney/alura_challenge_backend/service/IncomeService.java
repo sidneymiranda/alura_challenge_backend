@@ -5,6 +5,7 @@ import br.com.sidney.alura_challenge_backend.dto.IncomeResponse;
 import br.com.sidney.alura_challenge_backend.model.Income;
 import br.com.sidney.alura_challenge_backend.repository.IncomeRepository;
 import br.com.sidney.alura_challenge_backend.utils.DateUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +26,7 @@ public class IncomeService {
     }
 
     public IncomeResponse register(IncomeRequest request) {
-        if(exists(request.getDescription(), request.getDate())) {
+        if(validateRecordDate(request.getDescription(), request.getDate())) {
             throw new ValidationException("The income already registered for the informed month");
         }
 
@@ -57,16 +58,28 @@ public class IncomeService {
         return this.repository.existsById(Long.parseLong(id));
     }
 
-    private boolean exists(String description, String date) {
+    private boolean validateRecordDate(String description, String date) {
         Optional<Income> income = this.repository.findByDescription(description);
 
-        if(income.isEmpty()) {
+        if(income.isEmpty())
             return false;
-        }
 
         LocalDateTime register = income.get().getDate();
 
-        return register.getMonth().equals(DateUtils.stringToDate(date).getMonth());
+        return register.getYear() == DateUtils.stringToDate(date).getYear()
+                && register.getMonth().equals(DateUtils.stringToDate(date).getMonth());
+    }
+
+    public IncomeResponse update(String id, IncomeRequest incomeRequest) {
+        if (validateRecordDate(incomeRequest.getDescription(), incomeRequest.getDate()))
+            throw new ValidationException("Income cannot be updated, was registered in the current month");
+
+        Income income = this.repository.findById(Long.parseLong(id))
+                .orElseThrow(() -> new NoSuchElementException(""));
+
+        BeanUtils.copyProperties(incomeRequest, income);
+
+        return new IncomeResponse(this.repository.saveAndFlush(income));
     }
 
 }

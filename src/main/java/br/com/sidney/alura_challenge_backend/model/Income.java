@@ -39,6 +39,9 @@ public class Income implements Serializable {
     @Column(nullable = false)
     private LocalDateTime date;
 
+
+    private LocalDateTime updated;
+
     public Income() {
 
     }

@@ -49,4 +49,9 @@ public class IncomeController {
         this.service.delete(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PutMapping("{id}")
+    public ResponseEntity<IncomeResponse> update(@PathVariable String id, @RequestBody IncomeRequest income) {
+        return ResponseEntity.ok().body(this.service.update(id, income));
+    }
 }
