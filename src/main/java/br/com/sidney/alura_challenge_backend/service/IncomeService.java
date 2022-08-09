@@ -10,7 +10,9 @@ import org.springframework.stereotype.Service;
 
 import javax.validation.ValidationException;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class IncomeService {
@@ -31,6 +33,12 @@ public class IncomeService {
         income = this.repository.save(income);
 
         return new IncomeResponse(income);
+    }
+
+    public List<IncomeResponse> getAll() {
+        return this.repository.findAll()
+                .stream().map(IncomeResponse::new)
+                .collect(Collectors.toList());
     }
 
     private boolean exists(String description, String date) {

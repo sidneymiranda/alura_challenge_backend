@@ -12,6 +12,8 @@ import org.mockito.Mockito;
 import javax.validation.ConstraintValidator;
 import javax.validation.ValidationException;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -60,5 +62,30 @@ class IncomeServiceTest {
         final ValidationException validationException = assertThrows(ValidationException.class, () -> service.register(request));
 
         assertEquals("The income already registered for the informed month", validationException.getMessage());
+    }
+
+    @Test
+    void thenGetAll_thenReturnList() {
+        IncomeRequest curse = new IncomeRequest();
+        curse.setDate("08/08/2022 18:00");
+        curse.setDescription("Curso Design Pattern");
+        curse.setValue("99.90");
+
+        IncomeRequest internet = new IncomeRequest();
+        internet.setDate("10/08/2022 11:00");
+        internet.setDescription("Conta de internet");
+        internet.setValue("199.90");
+
+        IncomeRequest creditCard = new IncomeRequest();
+        creditCard.setDate("08/08/2022 18:00");
+        creditCard.setDescription("Visa Credit Card");
+        creditCard.setValue("2099.90");
+
+        final List<Income> incomes = Arrays.asList(new Income(curse), new Income(internet), new Income(creditCard));
+        when(repository.findAll()).thenReturn(incomes);
+
+        final List<IncomeResponse> incomeResponseList = service.getAll();
+
+        assertTrue(incomeResponseList.size() == 3);
     }
 }
