@@ -4,23 +4,21 @@ import br.com.sidney.alura_challenge_backend.dto.IncomeRequest;
 import br.com.sidney.alura_challenge_backend.dto.IncomeResponse;
 import br.com.sidney.alura_challenge_backend.model.Income;
 import br.com.sidney.alura_challenge_backend.repository.IncomeRepository;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
-import javax.validation.ConstraintValidator;
 import javax.validation.ValidationException;
-
 import java.util.Arrays;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+@DisplayName("Writing assertions for income services")
 class IncomeServiceTest {
 
     private static IncomeService service;
@@ -34,6 +32,7 @@ class IncomeServiceTest {
     }
 
     @Test
+    @DisplayName("Should save income")
     void whenRegister_thenSave() {
         IncomeRequest request = new IncomeRequest();
         request.setDate("08/08/2022 18:00");
@@ -49,6 +48,7 @@ class IncomeServiceTest {
     }
 
     @Test
+    @DisplayName("Should not save income that containing the same description within the same month")
     void whenIncomeWithDescriptionAndSameMonth_thenNotSave() {
         IncomeRequest request = new IncomeRequest();
         request.setDate("08/08/2022 18:00");
@@ -65,7 +65,8 @@ class IncomeServiceTest {
     }
 
     @Test
-    void thenGetAll_thenReturnList() {
+    @DisplayName("Should return all saved incomes")
+    void thenGetAll_thenReturnAllIncomes() {
         IncomeRequest curse = new IncomeRequest();
         curse.setDate("08/08/2022 18:00");
         curse.setDescription("Curso Design Pattern");
@@ -90,6 +91,7 @@ class IncomeServiceTest {
     }
 
     @Test
+    @DisplayName("Should return income through id")
     void whenIncomeFindById_thenReturnOneIncome() {
         IncomeRequest internet = new IncomeRequest();
         internet.setDate("10/08/2022 11:00");
@@ -99,10 +101,39 @@ class IncomeServiceTest {
         Income income = new Income(internet);
         income.setId(1L);
 
+        when(repository.existsById(any(Long.class))).thenReturn(Boolean.TRUE);
         when(repository.findById(any(Long.class))).thenReturn(Optional.of(income));
 
         final Optional<IncomeResponse> response = service.findById("1");
 
         assertEquals(income.getId().toString(), response.get().getId());
+    }
+
+    @Test
+    @DisplayName("Should delete income through id")
+    void whenExistsIncomeAndDeleteById_whenDeleteFromDb() {
+        IncomeRequest creditCard = new IncomeRequest();
+        creditCard.setDate("08/08/2022 18:00");
+        creditCard.setDescription("Visa Credit Card");
+        creditCard.setValue("2099.90");
+
+        Income income = new Income(creditCard);
+        income.setId(15L);
+
+        when(repository.existsById(any(Long.class))).thenReturn(Boolean.TRUE);
+        doNothing().when(repository).deleteById(any(Long.class));
+
+        service.delete("15");
+
+        assertDoesNotThrow(() -> {});
+    }
+
+    @Test
+    @DisplayName("Should throw exception when income does not exist")
+    void whenNoExistsIncome_whenThrowException() {
+        when(repository.existsById(any(Long.class))).thenReturn(Boolean.FALSE);
+        final NoSuchElementException validationException = assertThrows(NoSuchElementException.class, () -> service.delete("10"));
+
+        assertEquals("Income not exist by ID 10", validationException.getMessage());
     }
 }

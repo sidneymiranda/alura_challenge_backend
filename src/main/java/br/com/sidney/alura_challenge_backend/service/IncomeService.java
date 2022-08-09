@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import javax.validation.ValidationException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -43,6 +44,17 @@ public class IncomeService {
 
     public Optional<IncomeResponse> findById(String id) {
         return this.repository.findById(Long.parseLong(id)).map(IncomeResponse::new);
+    }
+
+    public void delete(String id) {
+        if (!isPresent(id))
+            throw new NoSuchElementException("Income not exist by ID " + id);
+
+        this.repository.deleteById(Long.parseLong(id));
+    }
+
+    private boolean isPresent(String id) {
+        return this.repository.existsById(Long.parseLong(id));
     }
 
     private boolean exists(String description, String date) {
