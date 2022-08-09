@@ -6,6 +6,7 @@ import br.com.sidney.alura_challenge_backend.service.IncomeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,6 +16,7 @@ import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/incomes")
@@ -37,5 +39,13 @@ public class IncomeController {
     @GetMapping
     public ResponseEntity<List<IncomeResponse>> getAll() {
         return ResponseEntity.ok().body(this.service.getAll());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> findById(@PathVariable String id) {
+        final Optional<IncomeResponse> income = this.service.findById(id);
+        return income.isPresent()
+                ? ResponseEntity.ok(this.service.findById(id))
+                : ResponseEntity.notFound().build();
     }
 }

@@ -41,6 +41,10 @@ public class IncomeService {
                 .collect(Collectors.toList());
     }
 
+    public Optional<IncomeResponse> findById(String id) {
+        return this.repository.findById(Long.parseLong(id)).map(IncomeResponse::new);
+    }
+
     private boolean exists(String description, String date) {
         Optional<Income> income = this.repository.findByDescription(description);
 

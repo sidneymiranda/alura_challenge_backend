@@ -88,4 +88,21 @@ class IncomeServiceTest {
 
         assertTrue(incomeResponseList.size() == 3);
     }
+
+    @Test
+    void whenIncomeFindById_thenReturnOneIncome() {
+        IncomeRequest internet = new IncomeRequest();
+        internet.setDate("10/08/2022 11:00");
+        internet.setDescription("Conta de internet");
+        internet.setValue("199.90");
+
+        Income income = new Income(internet);
+        income.setId(1L);
+
+        when(repository.findById(any(Long.class))).thenReturn(Optional.of(income));
+
+        final Optional<IncomeResponse> response = service.findById("1");
+
+        assertEquals(income.getId().toString(), response.get().getId());
+    }
 }
