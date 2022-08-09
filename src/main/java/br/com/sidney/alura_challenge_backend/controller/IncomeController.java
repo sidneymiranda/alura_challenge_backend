@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -25,7 +26,7 @@ public class IncomeController {
     }
 
     @PostMapping
-    public ResponseEntity<IncomeResponse> register(@RequestBody IncomeRequest income) throws URISyntaxException {
+    public ResponseEntity<IncomeResponse> register(@Valid @RequestBody IncomeRequest income) throws URISyntaxException {
        IncomeResponse incomeResponse = this.service.register(income);
 
        return ResponseEntity.created(new URI("")).body(incomeResponse);
