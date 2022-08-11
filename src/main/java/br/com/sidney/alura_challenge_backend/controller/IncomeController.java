@@ -6,6 +6,7 @@ import br.com.sidney.alura_challenge_backend.service.IncomeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
@@ -25,10 +26,11 @@ public class IncomeController {
     }
 
     @PostMapping
-    public ResponseEntity<IncomeResponse> register(@Valid @RequestBody IncomeRequest income) throws URISyntaxException {
+    public ResponseEntity<IncomeResponse> register(@Valid @RequestBody IncomeRequest income,
+                                                   UriComponentsBuilder uriBuilder) {
        IncomeResponse incomeResponse = this.service.register(income);
-
-       return ResponseEntity.created(new URI("")).body(incomeResponse);
+        URI address = uriBuilder.path("/incomes/{id}").buildAndExpand(incomeResponse.getId()).toUri();
+       return ResponseEntity.created(address).body(incomeResponse);
     }
 
     @GetMapping

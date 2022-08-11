@@ -89,7 +89,7 @@ class IncomeServiceTest {
 
         final List<IncomeResponse> incomeResponseList = service.getAll();
 
-        assertTrue(incomeResponseList.size() == 3);
+        assertEquals(3, incomeResponseList.size());
     }
 
     @Test
@@ -148,7 +148,7 @@ class IncomeServiceTest {
         income.setDate(DateUtils.stringToDate("08/08/2022 18:00"));
         income.setValue(new BigDecimal("2500.00"));
 
-        Income updatedVisaCard = income;
+        Income updatedVisaCard = new Income();
         updatedVisaCard.setValue(new BigDecimal("3500.00"));
         updatedVisaCard.setDescription("Visa card 2");
         updatedVisaCard.setDate(DateUtils.stringToDate("08/08/2022 18:00"));
@@ -168,7 +168,7 @@ class IncomeServiceTest {
                 () -> assertDoesNotThrow(() -> {
                 }),
                 () -> assertEquals(request.getValue(), response.getValue()),
-                () -> assertNotEquals(income.getValue(), response.getValue())
+                () -> assertNotEquals(income.getValue(), new BigDecimal(response.getValue()))
         );
     }
 
