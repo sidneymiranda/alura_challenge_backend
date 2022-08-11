@@ -191,4 +191,15 @@ class IncomeServiceTest {
         final ValidationException validationException = assertThrows(ValidationException.class, () -> service.update("3", request));
         assertEquals("Income cannot be updated, was registered in the current month", validationException.getMessage());
     }
+
+    @Test
+    @DisplayName("Should delete income by id")
+    void whenDeleteById_thenThrowsException() {
+        when(repository.existsById(32L)).thenReturn(false);
+        doNothing().when(repository).deleteById(any(Long.class));
+
+        final NoSuchElementException validationException = assertThrows(NoSuchElementException.class, () -> service.delete("32"));
+
+        assertEquals("Income not exist by ID 32", validationException.getMessage());
+    }
 }
