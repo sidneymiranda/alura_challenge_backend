@@ -60,6 +60,17 @@ public class ExpenseService {
         return new ExpenseResponse(this.repository.saveAndFlush(expense));
     }
 
+    public void delete(String id) {
+        if (!isPresent(id))
+            throw new NoSuchElementException("Expense not exist by ID " + id);
+
+        this.repository.deleteById(Long.parseLong(id));
+    }
+
+    private boolean isPresent(String id) {
+        return this.repository.existsById(Long.parseLong(id));
+    }
+
     private boolean validateRecordDate(String description, String date) {
         Optional<Expense> expense = this.repository.findByDescription(description);
 

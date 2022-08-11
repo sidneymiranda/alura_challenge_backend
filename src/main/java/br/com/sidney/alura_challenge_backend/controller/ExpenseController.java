@@ -51,6 +51,12 @@ public class ExpenseController {
     public ResponseEntity<ExpenseResponse> update(@PathVariable String id, @RequestBody ExpenseRequest expense) {
         return ResponseEntity.ok().body(this.service.update(id, expense));
     }
+
+    @DeleteMapping("{id}")
+    public ResponseEntity<Void> deleteById(@PathVariable String id) {
+        this.service.delete(id);
+        return ResponseEntity.noContent().build();
+    }
 }
 
 

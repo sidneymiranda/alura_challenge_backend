@@ -13,12 +13,12 @@ import javax.validation.ValidationException;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @DisplayName("Writing assertions for expense services")
 class ExpenseServiceTest {
@@ -156,6 +156,28 @@ class ExpenseServiceTest {
 
         final ValidationException validationException = assertThrows(ValidationException.class, () -> service.update("3", request));
         assertEquals("Expense cannot be updated, was registered in the current month", validationException.getMessage());
+    }
+
+    @Test
+    @DisplayName("Should delete expense by id")
+    void whenDeleteById_thenOk() {
+        when(repository.existsById(2L)).thenReturn(true);
+        doNothing().when(repository).deleteById(any(Long.class));
+
+        service.delete("2");
+        assertDoesNotThrow(() -> {});
+    }
+
+    @Test
+    @DisplayName("Should delete expense by id")
+    void whenDeleteById_thenThrowsException() {
+        when(repository.existsById(2L)).thenReturn(false);
+        doNothing().when(repository).deleteById(any(Long.class));
+
+
+        final NoSuchElementException validationException = assertThrows(NoSuchElementException.class, () -> service.delete("2"));
+
+        assertEquals("Expense not exist by ID 2", validationException.getMessage());
     }
 
 }
