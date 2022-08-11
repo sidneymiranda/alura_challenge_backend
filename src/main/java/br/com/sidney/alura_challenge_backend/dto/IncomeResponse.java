@@ -15,6 +15,9 @@ public class IncomeResponse {
 
     private String date;
 
+    public IncomeResponse() {
+    }
+
     public IncomeResponse(Income income) {
         this.id = String.valueOf(income.getId());
         this.description = income.getDescription();

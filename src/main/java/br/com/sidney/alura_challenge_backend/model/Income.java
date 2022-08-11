@@ -27,15 +27,11 @@ public class Income implements Serializable {
     private Long id;
 
     @Column(nullable = false)
-    @NotBlank(message = "Description is required")
     private String description;
 
     @Column(nullable = false)
-
-    @NotBlank(message = "Value is required")
     private BigDecimal value;
 
-    @NotBlank(message = "Date is required")
     @Column(nullable = false)
     private LocalDateTime date;
 

@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.Valid;
+import javax.validation.Validator;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,6 +19,7 @@ import java.util.Optional;
 public class IncomeController {
 
     private final IncomeService service;
+    private Validator validator;
 
     @Autowired
     public IncomeController(IncomeService service) {
@@ -29,7 +30,7 @@ public class IncomeController {
     public ResponseEntity<IncomeResponse> register(@Valid @RequestBody IncomeRequest income,
                                                    UriComponentsBuilder uriBuilder) {
        IncomeResponse incomeResponse = this.service.register(income);
-        URI address = uriBuilder.path("/incomes/{id}").buildAndExpand(incomeResponse.getId()).toUri();
+       URI address = uriBuilder.path("/incomes/{id}").buildAndExpand(incomeResponse.getId()).toUri();
        return ResponseEntity.created(address).body(incomeResponse);
     }
 
