@@ -11,7 +11,9 @@ import org.springframework.stereotype.Service;
 
 import javax.validation.ValidationException;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ExpenseService {
@@ -32,6 +34,12 @@ public class ExpenseService {
         income = this.repository.save(income);
 
         return new ExpenseResponse(income);
+    }
+
+    public List<ExpenseResponse> getAll() {
+        return this.repository.findAll()
+                .stream().map(ExpenseResponse::new)
+                .collect(Collectors.toList());
     }
 
     private boolean validateRecordDate(String description, String date) {

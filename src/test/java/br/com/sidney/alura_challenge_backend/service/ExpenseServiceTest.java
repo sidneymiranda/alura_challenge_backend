@@ -9,6 +9,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import javax.validation.ValidationException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -30,7 +32,7 @@ class ExpenseServiceTest {
     }
 
     @Test
-    @DisplayName("Should save income")
+    @DisplayName("Should save expense")
     void whenRegister_thenSave() {
         ExpenseRequest request = new ExpenseRequest();
         request.setDate("08/08/2022 18:00");
@@ -46,7 +48,7 @@ class ExpenseServiceTest {
     }
 
     @Test
-    @DisplayName("Should not save income that containing the same description within the same month")
+    @DisplayName("Should not save expense that containing the same description within the same month")
     void whenIncomeWithDescriptionAndSameMonth_thenNotSave() {
         ExpenseRequest request = new ExpenseRequest();
         request.setDate("08/08/2022 18:00");
@@ -62,5 +64,24 @@ class ExpenseServiceTest {
         assertEquals("The expense already registered for the informed month", validationException.getMessage());
     }
 
+    @Test
+    @DisplayName("Should return all saved expenses")
+    void thenGetAll_thenReturnAllIncomes() {
+        ExpenseRequest curse = new ExpenseRequest();
+        curse.setDate("12/03/2022 13:00");
+        curse.setDescription("Curso Design Pattern");
+        curse.setValue("99.90");
 
+        ExpenseRequest internet = new ExpenseRequest();
+        internet.setDate("15/03/2022 16:00");
+        internet.setDescription("Conta de internet");
+        internet.setValue("199.90");
+
+        final List<Expense> expenses = Arrays.asList(new Expense(curse), new Expense(internet));
+        when(repository.findAll()).thenReturn(expenses);
+
+        final List<ExpenseResponse> incomeResponseList = service.getAll();
+
+        assertEquals(2, incomeResponseList.size());
+    }
 }
