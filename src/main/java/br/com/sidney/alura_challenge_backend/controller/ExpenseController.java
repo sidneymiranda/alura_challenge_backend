@@ -2,6 +2,8 @@ package br.com.sidney.alura_challenge_backend.controller;
 
 import br.com.sidney.alura_challenge_backend.dto.ExpenseRequest;
 import br.com.sidney.alura_challenge_backend.dto.ExpenseResponse;
+import br.com.sidney.alura_challenge_backend.dto.IncomeRequest;
+import br.com.sidney.alura_challenge_backend.dto.IncomeResponse;
 import br.com.sidney.alura_challenge_backend.service.ExpenseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -36,13 +38,19 @@ public class ExpenseController {
     public ResponseEntity<List<ExpenseResponse>> getAll() {
         return ResponseEntity.ok().body(this.service.getAll());
     }
+
     @GetMapping("/{id}")
-      public ResponseEntity<?> findById(@PathVariable String id) {
+    public ResponseEntity<?> findById(@PathVariable String id) {
         final Optional<ExpenseResponse> expense = this.service.findById(id);
-       return expense.isPresent()
+        return expense.isPresent()
                 ? ResponseEntity.ok(this.service.findById(id))
                 : ResponseEntity.notFound().build();
-}
+    }
+
+    @PutMapping("{id}")
+    public ResponseEntity<ExpenseResponse> update(@PathVariable String id, @RequestBody ExpenseRequest expense) {
+        return ResponseEntity.ok().body(this.service.update(id, expense));
+    }
 }
 
 

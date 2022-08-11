@@ -34,6 +34,9 @@ public class Expense implements Serializable {
     @NotBlank(message = "Date is required")
     private LocalDateTime date;
 
+    public Expense() {
+    }
+
     public Expense(ExpenseRequest request) {
         this.description = request.getDescription();
         this.value = new BigDecimal(request.getValue()).setScale(2);

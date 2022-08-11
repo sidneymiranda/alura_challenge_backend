@@ -2,16 +2,15 @@ package br.com.sidney.alura_challenge_backend.service;
 
 import br.com.sidney.alura_challenge_backend.dto.ExpenseRequest;
 import br.com.sidney.alura_challenge_backend.dto.ExpenseResponse;
-import br.com.sidney.alura_challenge_backend.dto.IncomeRequest;
-import br.com.sidney.alura_challenge_backend.dto.IncomeResponse;
 import br.com.sidney.alura_challenge_backend.model.Expense;
-import br.com.sidney.alura_challenge_backend.model.Income;
 import br.com.sidney.alura_challenge_backend.repository.ExpenseRepository;
+import br.com.sidney.alura_challenge_backend.utils.DateUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import javax.validation.ValidationException;
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -105,6 +104,58 @@ class ExpenseServiceTest {
         final Optional<ExpenseResponse> response = service.findById("1");
 
         assertEquals(expense.getId().toString(), response.get().getId());
+    }
+
+    @Test
+    @DisplayName("Should update expense")
+    void whenUpdateValidIncome_thenOk() {
+        Expense expense = new Expense();
+        expense.setId(3L);
+        expense.setDescription("Visa card");
+        expense.setDate(DateUtils.stringToDate("08/08/2022 18:00"));
+        expense.setValue(new BigDecimal("2500.00"));
+
+        Expense updatedVisaCard = new Expense();
+        updatedVisaCard.setValue(new BigDecimal("3500.00"));
+        updatedVisaCard.setDescription("Visa card 2");
+        updatedVisaCard.setDate(DateUtils.stringToDate("08/08/2022 18:00"));
+
+        when(repository.findByDescription(any(String.class))).thenReturn(Optional.empty());
+        when(repository.findById(any(Long.class))).thenReturn(Optional.of(expense));
+        when(repository.saveAndFlush(any(Expense.class))).thenReturn(updatedVisaCard);
+
+        ExpenseRequest request = new ExpenseRequest();
+        request.setDescription("Visa card 2");
+        request.setValue("3500.00");
+        request.setDate("18/08/2022 18:00");
+
+        ExpenseResponse response = service.update("3", request);
+
+        assertAll(
+                () -> assertDoesNotThrow(() -> {}),
+                () -> assertEquals(request.getValue(), response.getValue()),
+                () -> assertNotEquals(expense.getValue(), new BigDecimal(response.getValue()))
+        );
+    }
+
+    @Test
+    @DisplayName("Should not update expense")
+    void whenUpdateIncomeWithDescriptionInTheSameMonth_thenThrowException() {
+        Expense expense = new Expense();
+        expense.setId(3L);
+        expense.setDescription("Visa card");
+        expense.setDate(DateUtils.stringToDate("08/08/2022 18:00"));
+        expense.setValue(new BigDecimal("2500.00"));
+
+        when(repository.findByDescription(any(String.class))).thenReturn(Optional.of(expense));
+
+        ExpenseRequest request = new ExpenseRequest();
+        request.setDescription("Visa card");
+        request.setValue("3500.00");
+        request.setDate("18/08/2022 18:00");
+
+        final ValidationException validationException = assertThrows(ValidationException.class, () -> service.update("3", request));
+        assertEquals("Expense cannot be updated, was registered in the current month", validationException.getMessage());
     }
 
 }
