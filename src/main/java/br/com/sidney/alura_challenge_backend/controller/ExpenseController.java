@@ -11,6 +11,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/expenses")
@@ -35,5 +36,15 @@ public class ExpenseController {
     public ResponseEntity<List<ExpenseResponse>> getAll() {
         return ResponseEntity.ok().body(this.service.getAll());
     }
-
+    @GetMapping("/{id}")
+      public ResponseEntity<?> findById(@PathVariable String id) {
+        final Optional<ExpenseResponse> expense = this.service.findById(id);
+       return expense.isPresent()
+                ? ResponseEntity.ok(this.service.findById(id))
+                : ResponseEntity.notFound().build();
 }
+}
+
+
+
+

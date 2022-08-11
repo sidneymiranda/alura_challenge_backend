@@ -2,7 +2,10 @@ package br.com.sidney.alura_challenge_backend.service;
 
 import br.com.sidney.alura_challenge_backend.dto.ExpenseRequest;
 import br.com.sidney.alura_challenge_backend.dto.ExpenseResponse;
+import br.com.sidney.alura_challenge_backend.dto.IncomeRequest;
+import br.com.sidney.alura_challenge_backend.dto.IncomeResponse;
 import br.com.sidney.alura_challenge_backend.model.Expense;
+import br.com.sidney.alura_challenge_backend.model.Income;
 import br.com.sidney.alura_challenge_backend.repository.ExpenseRepository;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -84,4 +87,24 @@ class ExpenseServiceTest {
 
         assertEquals(2, incomeResponseList.size());
     }
+
+    @Test
+    @DisplayName("Should return expense through id")
+    void whenIncomeFindById_thenReturnOneIncome() {
+        ExpenseRequest internet = new ExpenseRequest();
+        internet.setDate("10/08/2022 11:00");
+        internet.setDescription("Conta de internet");
+        internet.setValue("199.90");
+
+        Expense expense = new Expense(internet);
+        expense.setId(1L);
+
+        when(repository.existsById(any(Long.class))).thenReturn(Boolean.TRUE);
+        when(repository.findById(any(Long.class))).thenReturn(Optional.of(expense));
+
+        final Optional<ExpenseResponse> response = service.findById("1");
+
+        assertEquals(expense.getId().toString(), response.get().getId());
+    }
+
 }

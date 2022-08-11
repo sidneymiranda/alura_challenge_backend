@@ -2,6 +2,7 @@ package br.com.sidney.alura_challenge_backend.service;
 
 import br.com.sidney.alura_challenge_backend.dto.ExpenseRequest;
 import br.com.sidney.alura_challenge_backend.dto.ExpenseResponse;
+import br.com.sidney.alura_challenge_backend.dto.IncomeResponse;
 import br.com.sidney.alura_challenge_backend.model.Expense;
 import br.com.sidney.alura_challenge_backend.model.Income;
 import br.com.sidney.alura_challenge_backend.repository.ExpenseRepository;
@@ -52,6 +53,10 @@ public class ExpenseService {
 
         return register.getYear() == DateUtils.stringToDate(date).getYear()
                 && register.getMonth().equals(DateUtils.stringToDate(date).getMonth());
+    }
+
+    public Optional<ExpenseResponse> findById(String id) {
+        return this.repository.findById(Long.parseLong(id)).map(ExpenseResponse::new);
     }
 
 }
