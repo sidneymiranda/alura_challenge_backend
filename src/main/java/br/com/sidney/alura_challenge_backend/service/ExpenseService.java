@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.validation.ValidationException;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -77,7 +77,7 @@ public class ExpenseService {
         if(expense.isEmpty())
             return false;
 
-        LocalDateTime register = expense.get().getDate();
+        LocalDate register = expense.get().getDate();
 
         return register.getYear() == DateUtils.stringToDate(date).getYear()
                 && register.getMonth().equals(DateUtils.stringToDate(date).getMonth());

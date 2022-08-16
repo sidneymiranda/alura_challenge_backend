@@ -33,21 +33,21 @@ class IncomeServiceTest {
         service = new IncomeService(repository);
 
         incomeRequest = IncomeRequest.builder()
-                .date("08/08/2022 18:00")
+                .date("08/08/2022")
                 .value("99.90")
                 .description("Curso Design Pattern")
                 .build();
         incomes.add(new Income(incomeRequest));
 
         incomeRequest = IncomeRequest.builder()
-                .date("10/08/2022 12:00")
+                .date("10/08/2022")
                 .value("199.90")
                 .description("Internet Account")
                 .build();
         incomes.add(new Income(incomeRequest));
 
         incomeRequest = IncomeRequest.builder()
-                .date("08/08/2022 18:00")
+                .date("08/08/2022")
                 .value("2099.90")
                 .description("Visa Credit Card")
                 .build();
@@ -58,7 +58,7 @@ class IncomeServiceTest {
     @DisplayName("Should save income")
     void whenRegister_thenSave() {
         incomeRequest = IncomeRequest.builder()
-                .date("01/01/2022 18:00")
+                .date("01/01/2022")
                 .value("3099.90")
                 .description("Nubank Card")
                 .build();
@@ -74,7 +74,7 @@ class IncomeServiceTest {
     @DisplayName("Should not save income that containing the same description within the same month")
     void whenIncomeWithDescriptionAndSameMonth_thenNotSave() {
         incomeRequest = IncomeRequest.builder()
-                .date("15/01/2022 18:00")
+                .date("15/01/2022")
                 .value("3099.90")
                 .description("MasterCard")
                 .build();
@@ -138,7 +138,7 @@ class IncomeServiceTest {
     void whenUpdateValidIncome_thenOk() {
         Income income = incomes.get(2);
         incomeRequest = IncomeRequest.builder()
-                .date("08/08/2022 18:00")
+                .date("08/08/2022")
                 .value("2099.90")
                 .description("Nubank")
                 .build();
@@ -161,7 +161,7 @@ class IncomeServiceTest {
     void whenUpdateIncomeWithDescriptionInTheSameMonth_thenThrowException() {
         Income income = incomes.get(2);
         incomeRequest = IncomeRequest.builder()
-                .date("08/08/2022 13:30")
+                .date("08/08/2022")
                 .description("Visa Credit Card")
                 .value("9000.00")
                 .build();

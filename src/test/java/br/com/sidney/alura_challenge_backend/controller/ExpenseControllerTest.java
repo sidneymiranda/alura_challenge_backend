@@ -1,8 +1,8 @@
 package br.com.sidney.alura_challenge_backend.controller;
 
-import br.com.sidney.alura_challenge_backend.dto.IncomeRequest;
-import br.com.sidney.alura_challenge_backend.dto.IncomeResponse;
-import br.com.sidney.alura_challenge_backend.service.IncomeService;
+import br.com.sidney.alura_challenge_backend.dto.ExpenseRequest;
+import br.com.sidney.alura_challenge_backend.dto.ExpenseResponse;
+import br.com.sidney.alura_challenge_backend.service.ExpenseService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeAll;
@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
@@ -30,61 +29,65 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest
-@ContextConfiguration(classes = {IncomeController.class})
-@DisplayName("Income Controller REST Endpoint Testing With MockMvc")
-class IncomeControllerTest {
+@ContextConfiguration(classes = {ExpenseController.class})
+@DisplayName("Expense Controller REST Endpoint Testing With MockMvc")
+class ExpenseControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     @MockBean
-    private IncomeService incomeService;
+    private ExpenseService expenseService;
     private static final ObjectMapper mapper = new ObjectMapper();
-    private static final List<IncomeResponse> incomes = new ArrayList<>();
-    private static IncomeRequest incomeRequest;
+    private static final List<ExpenseResponse> incomes = new ArrayList<>();
+    private static ExpenseRequest expenseRequest;
 
     @BeforeAll
     static void setup() {
-        incomeRequest = IncomeRequest.builder()
+        expenseRequest = ExpenseRequest.builder()
                 .date("11/08/22 12:08")
                 .value("985.56")
-                .description("Salary")
+                .description("Cleaning products")
                 .build();
 
-        IncomeResponse income = new IncomeResponse();
-        income.setId("1");
-        income.setDate("30/08/22 10:08");
-        income.setValue("65000.00");
-        income.setDescription("Car sold");
-        incomes.add(income);
+        ExpenseResponse expense = new ExpenseResponse();
+        expense.setId("1");
+        expense.setDate("30/08/22 10:08");
+        expense.setValue("65000.00");
+        expense.setDescription("Fuel expense");
+        expense.setCategory("Transport");
+        incomes.add(expense);
 
-        income = new IncomeResponse();
-        income.setId("2");
-        income.setDate("11/08/22 12:08");
-        income.setValue("985.56");
-        income.setDescription("Salary");
-        incomes.add(income);
+        expense = new ExpenseResponse();
+        expense.setId("2");
+        expense.setDate("11/08/22 12:08");
+        expense.setValue("985.56");
+        expense.setDescription("Cleaning products");
+        expense.setCategory("Dwelling house");
+        incomes.add(expense);
 
-        income = new IncomeResponse();
-        income.setId("3");
-        income.setDate("11/08/22 12:08");
-        income.setValue("1085.56");
-        income.setDescription("Service provided");
-        incomes.add(income);
+        expense = new ExpenseResponse();
+        expense.setId("3");
+        expense.setDate("11/08/22 12:08");
+        expense.setValue("1085.56");
+        expense.setDescription("Cloud Microservices Course");
+        expense.setCategory("Education");
+        incomes.add(expense);
     }
 
 
     @Test
     @DisplayName("When save is successful then return the HTTP status code CREATED (201)")
-    void register() throws Exception {
-        IncomeResponse response = incomes.get(1);
-        when(incomeService.register(any(IncomeRequest.class))).thenReturn(response);
-        MvcResult mvcResult = mockMvc.perform(post("/api/v1/incomes")
-                        .content(mapper.writeValueAsString(incomeRequest))
+    void whenExpenseValid_thenCreated() throws Exception {
+        ExpenseResponse response = incomes.get(1);
+        when(expenseService.register(any(ExpenseRequest.class))).thenReturn(response);
+        MvcResult mvcResult = mockMvc.perform(post("/api/v1/expenses")
+                        .content(mapper.writeValueAsString(expenseRequest))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                         .andExpect(status().isCreated())
-                        .andExpect(jsonPath("$.description", Matchers.equalTo("Salary")))
+                        .andExpect(jsonPath("$.description", Matchers.equalTo("Cleaning products")))
+                        .andExpect(jsonPath("$.category", Matchers.equalTo("Dwelling house")))
                 .andReturn();
         String location = mvcResult.getResponse().getHeader("location");
         assertNotNull(location);
@@ -92,84 +95,87 @@ class IncomeControllerTest {
 
     @Test
     @DisplayName("Shouldn't create a new income and return the HTTP status code BAD REQUEST (400)")
-    void whenDescriptionIncomeIsNull_thenTBadRequest() throws Exception {
-        mockMvc.perform(post("/api/v1/incomes")
-                        .content(mapper.writeValueAsString(incomeRequest.builder().description(null).build()))
+    void whenDescriptionExpenseIsNull_thenTBadRequest() throws Exception {
+       mockMvc.perform(post("/api/v1/expenses")
+                        .content(mapper.writeValueAsString(expenseRequest.builder().description(null).build()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
-                        .andExpect(status().isBadRequest());
+                        .andExpect(status().isBadRequest())
+                        .andReturn();
     }
 
     @Test
     @DisplayName("Shouldn't create a new income and return the HTTP status code BAD REQUEST (400)")
-    void whenValueIncomeIsNull_thenTBadRequest() throws Exception {
-       mockMvc.perform(post("/api/v1/incomes")
-                        .content(mapper.writeValueAsString(incomeRequest.builder().value(null).build()))
+    void whenValueExpenseIsNull_thenTBadRequest() throws Exception {
+       mockMvc.perform(post("/api/v1/expenses")
+                        .content(mapper.writeValueAsString(expenseRequest.builder().value(null).build()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
-                        .andExpect(status().isBadRequest());
+                        .andExpect(status().isBadRequest())
+                        .andReturn();
     }
 
     @Test
     @DisplayName("Shouldn't create a new income and return the HTTP status code BAD REQUEST (400)")
-    void whenDateIncomeIsNull_thenTBadRequest() throws Exception {
-        mockMvc.perform(post("/api/v1/incomes")
-                        .content(mapper.writeValueAsString(incomeRequest.builder().date(null).build()))
+    void whenDateExpenseIsNull_thenTBadRequest() throws Exception {
+       mockMvc.perform(post("/api/v1/expenses")
+                        .content(mapper.writeValueAsString(expenseRequest.builder().date(null).build()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
-                        .andExpect(status().isBadRequest());
+                        .andExpect(status().isBadRequest())
+                        .andReturn();
     }
 
     @Test
     @DisplayName("Should return the HTTP status code OK (200) and income list")
     void getAll() throws Exception {
-        when(incomeService.getAll()).thenReturn(incomes);
+        when(expenseService.getAll()).thenReturn(incomes);
 
-        mockMvc.perform(get("/api/v1/incomes"))
+        mockMvc.perform(get("/api/v1/expenses"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.hasSize(3)))
-                .andExpect(jsonPath("$[0].description", Matchers.equalTo("Car sold")));
+                .andExpect(jsonPath("$[0].description", Matchers.equalTo("Fuel expense")));
     }
 
     @Test
     @DisplayName("Should return the HTTP status code OK (200) and income by id")
     void findById() throws Exception {
-        when(incomeService.findById("3")).thenReturn(Optional.of(incomes.get(2)));
+        when(expenseService.findById("3")).thenReturn(Optional.of(incomes.get(2)));
 
-        mockMvc.perform(get("/api/v1/incomes/{id}", "3"))
+        mockMvc.perform(get("/api/v1/expenses/{id}", "3"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", Matchers.equalTo("3")))
-                .andExpect(jsonPath("$.description", Matchers.equalTo("Service provided")));
+                .andExpect(jsonPath("$.description", Matchers.equalTo("Cloud Microservices Course")));
     }
 
     @Test
     @DisplayName("Should delete income by id")
     void deleteById() throws Exception {
-        doNothing().when(incomeService).delete("1");
+        doNothing().when(expenseService).delete("1");
 
-        mockMvc.perform(delete("/api/v1/incomes/{id}", "1"))
+        mockMvc.perform(delete("/api/v1/expenses/{id}", "1"))
                 .andExpect(status().isNoContent());
     }
 
     @Test
     @DisplayName("Should update income")
     void update() throws Exception {
-        incomeRequest = IncomeRequest.builder()
+        expenseRequest = ExpenseRequest.builder()
                 .description("BMW")
                 .date("30/08/22 10:08")
                 .value("65000.00")
                 .build();
 
-        IncomeResponse response = new IncomeResponse();
+        ExpenseResponse response = new ExpenseResponse();
         response.setId("1");
         response.setDescription("BMW");
         response.setDate("30/08/22 10:08");
         response.setValue("65000.00");
 
-        when(incomeService.update("1", incomeRequest)).thenReturn(response);
+        when(expenseService.update("1", expenseRequest)).thenReturn(response);
 
-        mockMvc.perform(put("/api/v1/incomes/{id}", "1")
-                .content(mapper.writeValueAsString(incomeRequest))
+        mockMvc.perform(put("/api/v1/expenses/{id}", "1")
+                .content(mapper.writeValueAsString(expenseRequest))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())

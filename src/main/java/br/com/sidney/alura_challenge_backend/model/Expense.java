@@ -1,16 +1,17 @@
 package br.com.sidney.alura_challenge_backend.model;
 
 import br.com.sidney.alura_challenge_backend.dto.ExpenseRequest;
+import br.com.sidney.alura_challenge_backend.enums.Category;
 import br.com.sidney.alura_challenge_backend.utils.DateUtils;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.math.RoundingMode;
+import java.time.LocalDate;
 
 @Entity
 @Getter
@@ -23,23 +24,28 @@ public class Expense implements Serializable {
     private Long id;
 
     @Column(nullable = false)
-    @NotBlank(message = "Description is required")
     private String description;
 
     @Column(nullable = false)
-    @NotBlank(message = "Value is required")
     private BigDecimal value;
 
     @Column(nullable = false)
-    @NotBlank(message = "Date is required")
-    private LocalDateTime date;
+    private LocalDate date;
 
-    public Expense() {
-    }
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20)
+    private Category category;
+
+    public Expense() { }
 
     public Expense(ExpenseRequest request) {
         this.description = request.getDescription();
-        this.value = new BigDecimal(request.getValue()).setScale(2);
+        this.value = new BigDecimal(request.getValue()).setScale(2, RoundingMode.UP);
         this.date = DateUtils.stringToDate(request.getDate());
+        this.category = categoryVerify(request.getCategory());
+    }
+
+    private Category categoryVerify(String category) {
+        return category == null ? Category.OTHERS : Category.valueOf(category.toUpperCase());
     }
 }

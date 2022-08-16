@@ -1,19 +1,17 @@
 package br.com.sidney.alura_challenge_backend.model;
 
 import br.com.sidney.alura_challenge_backend.dto.IncomeRequest;
+import br.com.sidney.alura_challenge_backend.enums.Category;
 import br.com.sidney.alura_challenge_backend.utils.DateUtils;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.validation.constraints.NotBlank;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -33,10 +31,12 @@ public class Income implements Serializable {
     private BigDecimal value;
 
     @Column(nullable = false)
-    private LocalDateTime date;
+    private LocalDate date;
 
+    private LocalDate updated;
 
-    private LocalDateTime updated;
+    @Enumerated(EnumType.STRING)
+    private Category category;
 
     public Income() {
 
@@ -44,7 +44,7 @@ public class Income implements Serializable {
 
     public Income(IncomeRequest request) {
         this.description = request.getDescription();
-        this.value = new BigDecimal(request.getValue()).setScale(2);
+        this.value = new BigDecimal(request.getValue()).setScale(2, RoundingMode.UP);
         this.date = DateUtils.stringToDate(request.getDate());
     }
 }

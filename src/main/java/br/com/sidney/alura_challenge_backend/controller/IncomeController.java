@@ -19,7 +19,6 @@ import java.util.Optional;
 public class IncomeController {
 
     private final IncomeService service;
-    private Validator validator;
 
     @Autowired
     public IncomeController(IncomeService service) {
