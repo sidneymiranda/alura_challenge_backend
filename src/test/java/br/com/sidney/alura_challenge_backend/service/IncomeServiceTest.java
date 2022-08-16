@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -34,22 +35,43 @@ class IncomeServiceTest {
 
         incomeRequest = IncomeRequest.builder()
                 .date("08/08/2022")
-                .value("99.90")
-                .description("Curso Design Pattern")
+                .value("5599.90")
+                .description("Salary")
                 .build();
         incomes.add(new Income(incomeRequest));
 
         incomeRequest = IncomeRequest.builder()
                 .date("10/08/2022")
                 .value("199.90")
-                .description("Internet Account")
+                .description("Loan")
                 .build();
         incomes.add(new Income(incomeRequest));
 
         incomeRequest = IncomeRequest.builder()
-                .date("08/08/2022")
-                .value("2099.90")
-                .description("Visa Credit Card")
+                .date("18/10/2022")
+                .value("2100.00")
+                .description("Loan")
+                .build();
+        incomes.add(new Income(incomeRequest));
+
+        incomeRequest = IncomeRequest.builder()
+                .date("18/11/2022")
+                .value("3100.00")
+                .description("iPhone 12")
+                .build();
+        incomes.add(new Income(incomeRequest));
+
+        incomeRequest = IncomeRequest.builder()
+                .date("18/11/2022")
+                .value("6500.00")
+                .description("iPhone 13")
+                .build();
+        incomes.add(new Income(incomeRequest));
+
+        incomeRequest = IncomeRequest.builder()
+                .date("18/11/2022")
+                .value("8500.00")
+                .description("iPhone 13 Pro")
                 .build();
         incomes.add(new Income(incomeRequest));
     }
@@ -58,11 +80,11 @@ class IncomeServiceTest {
     @DisplayName("Should save income")
     void whenRegister_thenSave() {
         incomeRequest = IncomeRequest.builder()
-                .date("01/01/2022")
-                .value("3099.90")
-                .description("Nubank Card")
+                .date("08/08/2022")
+                .value("5990.90")
+                .description("Salary")
                 .build();
-        Income income = new Income(incomeRequest);
+        Income income = incomes.get(0);
         when(repository.save(any(Income.class))).thenReturn(income);
 
         IncomeResponse response = service.register(incomeRequest);
@@ -74,12 +96,12 @@ class IncomeServiceTest {
     @DisplayName("Should not save income that containing the same description within the same month")
     void whenIncomeWithDescriptionAndSameMonth_thenNotSave() {
         incomeRequest = IncomeRequest.builder()
-                .date("15/01/2022")
+                .date("15/08/2022")
                 .value("3099.90")
-                .description("MasterCard")
+                .description("Loan")
                 .build();
 
-        Income income = new Income(incomeRequest);
+        Income income = incomes.get(1);
 
         when(repository.findByDescription(any(String.class))).thenReturn(Optional.of(income));
 
@@ -90,16 +112,45 @@ class IncomeServiceTest {
 
     @Test
     @DisplayName("Should return all saved incomes")
-    void thenGetAll_thenReturnAllIncomes() {
+    void whenGetAllByDescription_thenReturnMatchIncomes() {
         when(repository.findAll()).thenReturn(incomes);
-        final List<IncomeResponse> incomeResponseList = service.getAll();
+        final List<IncomeResponse> incomeResponseList = service.getAll(Optional.empty());
+        assertEquals(6, incomeResponseList.size());
+    }
+
+    @Test
+    @DisplayName("Should return all incomes with match description")
+    void whenGetAllByDescription_thenReturnAllMatchIncomes() {
+        String param = "Loan";
+        List<Income> filteredList = incomes.stream()
+                .filter(income -> income.getDescription().equals(param))
+                .collect(Collectors.toList());
+
+        when(repository.findByDescriptionContainingIgnoreCase(param)).thenReturn(filteredList);
+        final List<IncomeResponse> incomeResponseList = service.getAll(Optional.of(param));
+
+        assertEquals(2, incomeResponseList.size());
+    }
+
+    @Test
+    @DisplayName("Should return all incomes with match description")
+    void whenGetAllByDescription_thenReturnAllIncomesWithContainsTheKeywordInDescription() {
+        String param = "phonE";
+
+        List<Income> filteredList = incomes.stream()
+                .filter(income -> income.getDescription().toLowerCase().contains(param.toLowerCase()))
+                .collect(Collectors.toList());
+
+        when(repository.findByDescriptionContainingIgnoreCase(param)).thenReturn(filteredList);
+        final List<IncomeResponse> incomeResponseList = service.getAll(Optional.of(param));
+
         assertEquals(3, incomeResponseList.size());
     }
 
     @Test
     @DisplayName("Should return income through id")
     void whenIncomeFindById_thenReturnOneIncome() {
-        Income income = new Income(incomeRequest);
+        Income income = incomes.get(0);
         income.setId(1L);
 
         when(repository.existsById(any(Long.class))).thenReturn(Boolean.TRUE);
@@ -112,8 +163,8 @@ class IncomeServiceTest {
 
     @Test
     @DisplayName("Should delete income through id")
-    void whenExistsIncomeAndDeleteById_thenDeleteFromDb() {
-        Income income = new Income(incomeRequest);
+    void whenExistsIncomeAndDeleteById_thenDelete() {
+        Income income = incomes.get(2);
         income.setId(15L);
 
         when(repository.existsById(any(Long.class))).thenReturn(Boolean.TRUE);
@@ -126,21 +177,23 @@ class IncomeServiceTest {
     @Test
     @DisplayName("Should throw exception when income does not exist")
     void whenNoExistsIncome_thenThrowException() {
+        String id = "10";
         when(repository.existsById(any(Long.class))).thenReturn(Boolean.FALSE);
         final NoSuchElementException validationException =
-                assertThrows(NoSuchElementException.class, () -> service.delete("10"));
+                assertThrows(NoSuchElementException.class, () -> service.delete(id));
 
-        assertEquals("Income not exist by ID 10", validationException.getMessage());
+        assertEquals("Income not exist by ID " + id, validationException.getMessage());
     }
 
     @Test
     @DisplayName("Should update income")
     void whenUpdateValidIncome_thenOk() {
-        Income income = incomes.get(2);
+        Income income = incomes.get(3);
+        income.setId(3L);
         incomeRequest = IncomeRequest.builder()
-                .date("08/08/2022")
-                .value("2099.90")
-                .description("Nubank")
+                .date("18/11/2022")
+                .value("5100.00")
+                .description("iPhone 12 Pro")
                 .build();
 
         Income updatedVisaCard = new Income(incomeRequest);
@@ -153,22 +206,27 @@ class IncomeServiceTest {
 
         assertAll(
                 () -> assertDoesNotThrow(() -> {}),
-                () -> assertEquals(incomeRequest.getValue(), response.getValue()));
+                () -> assertEquals(incomeRequest.getDescription(), response.getDescription()));
     }
 
     @Test
     @DisplayName("Should not update income")
     void whenUpdateIncomeWithDescriptionInTheSameMonth_thenThrowException() {
         Income income = incomes.get(2);
+        income.setId(3L);
         incomeRequest = IncomeRequest.builder()
-                .date("08/08/2022")
-                .description("Visa Credit Card")
-                .value("9000.00")
+                .date("28/10/2022")
+                .value("100.00")
+                .description("Loan")
                 .build();
         when(repository.findByDescription(any(String.class))).thenReturn(Optional.of(income));
-        final ValidationException validationException = assertThrows(ValidationException.class, () -> service.update("2", incomeRequest));
+        when(repository.findById(any(Long.class))).thenReturn(Optional.of(income));
+        final ValidationException validationException = assertThrows(ValidationException.class,
+                () -> service.update("3", incomeRequest));
 
-        assertEquals("Income cannot be updated, was registered in the current month", validationException.getMessage());
+        assertEquals(
+                "Income cannot be updated, was registered in the current month",
+                validationException.getMessage());
     }
 
     @Test
@@ -177,7 +235,8 @@ class IncomeServiceTest {
         when(repository.existsById(32L)).thenReturn(false);
         doNothing().when(repository).deleteById(any(Long.class));
 
-        final NoSuchElementException validationException = assertThrows(NoSuchElementException.class, () -> service.delete("32"));
+        final NoSuchElementException validationException =
+                assertThrows(NoSuchElementException.class, () -> service.delete("32"));
 
         assertEquals("Income not exist by ID 32", validationException.getMessage());
     }

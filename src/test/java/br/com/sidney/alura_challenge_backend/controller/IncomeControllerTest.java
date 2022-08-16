@@ -123,7 +123,7 @@ class IncomeControllerTest {
     @Test
     @DisplayName("Should return the HTTP status code OK (200) and income list")
     void getAll() throws Exception {
-        when(incomeService.getAll()).thenReturn(incomes);
+        when(incomeService.getAll(Optional.empty())).thenReturn(incomes);
 
         mockMvc.perform(get("/api/v1/incomes"))
                 .andExpect(status().isOk())

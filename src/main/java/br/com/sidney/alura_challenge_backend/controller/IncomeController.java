@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.Valid;
-import javax.validation.Validator;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
@@ -34,8 +33,8 @@ public class IncomeController {
     }
 
     @GetMapping
-    public ResponseEntity<List<IncomeResponse>> getAll() {
-        return ResponseEntity.ok().body(this.service.getAll());
+    public ResponseEntity<List<IncomeResponse>> getAll(@RequestParam(required = false) Optional<String> description) {
+        return ResponseEntity.ok().body(this.service.getAll(description));
     }
 
     @GetMapping("/{id}")

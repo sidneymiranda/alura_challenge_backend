@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import javax.validation.ValidationException;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -38,9 +37,14 @@ public class IncomeService {
         return new IncomeResponse(income);
     }
 
-    public List<IncomeResponse> getAll() {
-        return this.repository.findAll()
-                .stream().map(IncomeResponse::new)
+    public List<IncomeResponse> getAll(Optional<String> description) {
+        List<Income> incomes;
+        if(description.isEmpty())
+            incomes = this.repository.findAll();
+        else
+            incomes = this.repository.findByDescriptionContainingIgnoreCase(description.get());
+
+        return incomes.stream().map(IncomeResponse::new)
                 .collect(Collectors.toList());
     }
 
@@ -60,7 +64,7 @@ public class IncomeService {
     }
 
     private boolean validateRecordDate(String description, String date) {
-        Optional<Income> income = this.repository.findByDescription(description);
+        Optional<Income> income = findByDescription(description);
 
         if(income.isEmpty())
             return false;
@@ -69,6 +73,10 @@ public class IncomeService {
 
         return register.getYear() == DateUtils.stringToDate(date).getYear()
                 && register.getMonth().equals(DateUtils.stringToDate(date).getMonth());
+    }
+
+    public Optional<Income> findByDescription(String description) {
+        return this.repository.findByDescription(description);
     }
 
     public IncomeResponse update(String id, IncomeRequest incomeRequest) {
