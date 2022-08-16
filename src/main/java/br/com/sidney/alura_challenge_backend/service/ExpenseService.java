@@ -2,7 +2,9 @@ package br.com.sidney.alura_challenge_backend.service;
 
 import br.com.sidney.alura_challenge_backend.dto.ExpenseRequest;
 import br.com.sidney.alura_challenge_backend.dto.ExpenseResponse;
+import br.com.sidney.alura_challenge_backend.dto.IncomeResponse;
 import br.com.sidney.alura_challenge_backend.model.Expense;
+import br.com.sidney.alura_challenge_backend.model.Income;
 import br.com.sidney.alura_challenge_backend.repository.ExpenseRepository;
 import br.com.sidney.alura_challenge_backend.utils.DateUtils;
 import org.springframework.beans.BeanUtils;
@@ -37,9 +39,14 @@ public class ExpenseService {
         return new ExpenseResponse(income);
     }
 
-    public List<ExpenseResponse> getAll() {
-        return this.repository.findAll()
-                .stream().map(ExpenseResponse::new)
+    public List<ExpenseResponse> getAll(Optional<String> description) {
+        List<Expense> incomes;
+        if(description.isEmpty())
+            incomes = this.repository.findAll();
+        else
+            incomes = this.repository.findByDescriptionContainingIgnoreCase(description.get());
+
+        return incomes.stream().map(ExpenseResponse::new)
                 .collect(Collectors.toList());
     }
 

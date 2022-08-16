@@ -19,9 +19,9 @@ import org.springframework.test.web.servlet.MvcResult;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
@@ -70,6 +70,13 @@ class IncomeControllerTest {
         income.setDate("11/08/22 12:08");
         income.setValue("1085.56");
         income.setDescription("Service provided");
+        incomes.add(income);
+
+        income = new IncomeResponse();
+        income.setId("2");
+        income.setDate("71/11/22 11:08");
+        income.setValue("2985.56");
+        income.setDescription("Salary");
         incomes.add(income);
     }
 
@@ -121,13 +128,28 @@ class IncomeControllerTest {
     }
 
     @Test
+    @DisplayName("Should return the HTTP status code OK (200) and income match list")
+    void getAllByDescription() throws Exception {
+        String param = "salary";
+        List<IncomeResponse> filteredList = incomes.stream()
+                .filter(income -> income.getDescription().toLowerCase().contains(param.toLowerCase()))
+                .collect(Collectors.toList());
+
+        when(incomeService.getAll(Optional.of(param))).thenReturn(filteredList);
+
+        mockMvc.perform(get("/api/v1/incomes?description=salary"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", Matchers.hasSize(2)));
+    }
+
+    @Test
     @DisplayName("Should return the HTTP status code OK (200) and income list")
     void getAll() throws Exception {
         when(incomeService.getAll(Optional.empty())).thenReturn(incomes);
 
         mockMvc.perform(get("/api/v1/incomes"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", Matchers.hasSize(3)))
+                .andExpect(jsonPath("$", Matchers.hasSize(4)))
                 .andExpect(jsonPath("$[0].description", Matchers.equalTo("Car sold")));
     }
 

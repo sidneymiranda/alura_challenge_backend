@@ -12,7 +12,6 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -32,8 +31,6 @@ public class Income implements Serializable {
 
     @Column(nullable = false)
     private LocalDate date;
-
-    private LocalDate updated;
 
     @Enumerated(EnumType.STRING)
     private Category category;

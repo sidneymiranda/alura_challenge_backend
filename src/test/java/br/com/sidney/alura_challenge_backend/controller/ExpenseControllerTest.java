@@ -19,6 +19,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
@@ -39,7 +40,7 @@ class ExpenseControllerTest {
     @MockBean
     private ExpenseService expenseService;
     private static final ObjectMapper mapper = new ObjectMapper();
-    private static final List<ExpenseResponse> incomes = new ArrayList<>();
+    private static final List<ExpenseResponse> expenses = new ArrayList<>();
     private static ExpenseRequest expenseRequest;
 
     @BeforeAll
@@ -56,7 +57,7 @@ class ExpenseControllerTest {
         expense.setValue("65000.00");
         expense.setDescription("Fuel expense");
         expense.setCategory("Transport");
-        incomes.add(expense);
+        expenses.add(expense);
 
         expense = new ExpenseResponse();
         expense.setId("2");
@@ -64,7 +65,7 @@ class ExpenseControllerTest {
         expense.setValue("985.56");
         expense.setDescription("Cleaning products");
         expense.setCategory("Dwelling house");
-        incomes.add(expense);
+        expenses.add(expense);
 
         expense = new ExpenseResponse();
         expense.setId("3");
@@ -72,14 +73,14 @@ class ExpenseControllerTest {
         expense.setValue("1085.56");
         expense.setDescription("Cloud Microservices Course");
         expense.setCategory("Education");
-        incomes.add(expense);
+        expenses.add(expense);
     }
 
 
     @Test
     @DisplayName("When save is successful then return the HTTP status code CREATED (201)")
     void whenExpenseValid_thenCreated() throws Exception {
-        ExpenseResponse response = incomes.get(1);
+        ExpenseResponse response = expenses.get(1);
         when(expenseService.register(any(ExpenseRequest.class))).thenReturn(response);
         MvcResult mvcResult = mockMvc.perform(post("/api/v1/expenses")
                         .content(mapper.writeValueAsString(expenseRequest))
@@ -129,7 +130,7 @@ class ExpenseControllerTest {
     @Test
     @DisplayName("Should return the HTTP status code OK (200) and income list")
     void getAll() throws Exception {
-        when(expenseService.getAll()).thenReturn(incomes);
+        when(expenseService.getAll(Optional.empty())).thenReturn(expenses);
 
         mockMvc.perform(get("/api/v1/expenses"))
                 .andExpect(status().isOk())
@@ -138,9 +139,24 @@ class ExpenseControllerTest {
     }
 
     @Test
+    @DisplayName("Should return the HTTP status code OK (200) and income match list")
+    void getAllByDescription() throws Exception {
+        String param = "microservices";
+        List<ExpenseResponse> filteredList = expenses.stream()
+                .filter(expense -> expense.getDescription().toLowerCase().contains(param.toLowerCase()))
+                .collect(Collectors.toList());
+        when(expenseService.getAll(Optional.of(param))).thenReturn(filteredList);
+
+        mockMvc.perform(get("/api/v1/expenses?description=microservices"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", Matchers.hasSize(1)))
+                .andExpect(jsonPath("$[0].description", Matchers.equalTo("Cloud Microservices Course")));
+    }
+
+    @Test
     @DisplayName("Should return the HTTP status code OK (200) and income by id")
     void findById() throws Exception {
-        when(expenseService.findById("3")).thenReturn(Optional.of(incomes.get(2)));
+        when(expenseService.findById("3")).thenReturn(Optional.of(expenses.get(2)));
 
         mockMvc.perform(get("/api/v1/expenses/{id}", "3"))
                 .andExpect(status().isOk())

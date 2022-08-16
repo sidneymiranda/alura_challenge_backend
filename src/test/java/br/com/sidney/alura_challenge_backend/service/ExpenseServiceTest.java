@@ -16,9 +16,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -58,6 +58,14 @@ class ExpenseServiceTest {
                 .category("EDUCATION")
                 .build();
         expenses.add(new Expense(expenseRequest));
+
+        expenseRequest = ExpenseRequest.builder()
+                .date("01/09/2022")
+                .value("699.90")
+                .description("AWS Certified Cloud Practitioner")
+                .category("EDUCATION")
+                .build();
+        expenses.add(new Expense(expenseRequest));
     }
 
     @Test
@@ -93,7 +101,7 @@ class ExpenseServiceTest {
 
     @Test
     @DisplayName("Should not save expense that containing the same description within the same month")
-    void whenIncomeWithDescriptionAndSameMonth_thenNotSave() {
+    void whenExpenseWithDescriptionAndSameMonth_thenNotSave() {
         ExpenseRequest request = ExpenseRequest.builder()
                 .date("11/08/2022")
                 .value("685.56")
@@ -113,17 +121,31 @@ class ExpenseServiceTest {
 
     @Test
     @DisplayName("Should return all saved expenses")
-    void thenGetAll_thenReturnAllIncomes() {
+    void thenGetAll_thenReturnAllExpense() {
         when(repository.findAll()).thenReturn(expenses);
 
-        final List<ExpenseResponse> incomeResponseList = service.getAll();
+        final List<ExpenseResponse> expenses = service.getAll(Optional.empty());
 
-        assertEquals(3, incomeResponseList.size());
+        assertEquals(4, expenses.size());
+    }
+
+    @Test
+    @DisplayName("Should return all expenses with match description")
+    void whenGetAllByDescription_thenReturnMatchExpense() {
+        String param = "cloud";
+        List<Expense> filteredList = expenses.stream()
+                .filter(income -> income.getDescription().toLowerCase().contains(param.toLowerCase()))
+                .collect(Collectors.toList());
+        when(repository.findByDescriptionContainingIgnoreCase(param)).thenReturn(filteredList);
+
+        final List<ExpenseResponse> expenses = service.getAll(Optional.of(param));
+
+        assertEquals(2, expenses.size());
     }
 
     @Test
     @DisplayName("Should return expense through id")
-    void whenIncomeFindById_thenReturnOneIncome() {
+    void whenExpenseFindById_thenReturnOneExpense() {
         Expense expense = expenses.get(1);
         expense.setId(2L);
 
@@ -137,7 +159,7 @@ class ExpenseServiceTest {
 
     @Test
     @DisplayName("Should update expense")
-    void whenUpdateValidIncome_thenOk() {
+    void whenUpdateValidExpense_thenOk() {
         Expense expense = expenses.get(0);
         expense.setId(1L);
 
@@ -169,7 +191,7 @@ class ExpenseServiceTest {
 
     @Test
     @DisplayName("Should not update expense")
-    void whenUpdateIncomeWithDescriptionInTheSameMonth_thenThrowException() {
+    void whenUpdateExpenseWithDescriptionInTheSameMonth_thenThrowException() {
         Expense expense = new Expense();
         expense.setId(3L);
         expense.setDescription("Visa card");

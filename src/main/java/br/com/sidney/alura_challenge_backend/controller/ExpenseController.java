@@ -33,8 +33,8 @@ public class ExpenseController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ExpenseResponse>> getAll() {
-        return ResponseEntity.ok().body(this.service.getAll());
+    public ResponseEntity<List<ExpenseResponse>> getAll(@RequestParam(required = false) Optional<String> description) {
+        return ResponseEntity.ok().body(this.service.getAll(description));
     }
 
     @GetMapping("/{id}")
