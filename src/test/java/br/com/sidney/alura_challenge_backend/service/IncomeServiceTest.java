@@ -111,24 +111,10 @@ class IncomeServiceTest {
 
     @Test
     @DisplayName("Should return all saved incomes")
-    void whenGetAllByDescription_thenReturnMatchIncomes() {
+    void whenGetAllByDescription_thenReturnAllIncomes() {
         when(repository.findAll()).thenReturn(incomes);
         final List<IncomeResponse> incomeResponseList = service.getAll(Optional.empty());
         assertEquals(6, incomeResponseList.size());
-    }
-
-    @Test
-    @DisplayName("Should return all incomes with match description")
-    void whenGetAllByDescription_thenReturnAllMatchIncomes() {
-        String param = "Loan";
-        List<Income> filteredList = incomes.stream()
-                .filter(income -> income.getDescription().equals(param))
-                .collect(Collectors.toList());
-
-        when(repository.findByDescriptionContainingIgnoreCase(param)).thenReturn(filteredList);
-        final List<IncomeResponse> incomeResponseList = service.getAll(Optional.of(param));
-
-        assertEquals(2, incomeResponseList.size());
     }
 
     @Test
@@ -242,7 +228,7 @@ class IncomeServiceTest {
 
     @Test
     @DisplayName("Should return incomes from the same month")
-    void whenFindByMonth_thenReturnIncomesForTheMonthInformed() {
+    void whenFindByMonth_thenReturnExpensesForTheMonthInformed() {
         String month = "11";
         String year = "2022";
         List<Income> matchers = incomes.stream()

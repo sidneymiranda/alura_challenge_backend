@@ -12,10 +12,9 @@ import org.junit.jupiter.api.Test;
 
 import javax.validation.ValidationException;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.time.Month;
+import java.time.Year;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -215,7 +214,7 @@ class ExpenseServiceTest {
     @Test
     @DisplayName("Should delete expense by id")
     void whenDeleteById_thenOk() {
-        when(repository.existsById(2L)).thenReturn(true);
+        when(repository.existsById(2L)).thenReturn(Boolean.TRUE);
         doNothing().when(repository).deleteById(any(Long.class));
 
         service.delete("2");
@@ -232,6 +231,22 @@ class ExpenseServiceTest {
                 assertThrows(NoSuchElementException.class, () -> service.delete("2"));
 
         assertEquals("Expense not exist by ID 2", validationException.getMessage());
+    }
+
+    @Test
+    @DisplayName("Should return expense from the same month")
+    void whenFindByMonth_thenReturnExpensesForTheMonthInformed() {
+        String month = "09";
+        String year = "2022";
+        List<Expense> matchers = expenses.stream()
+                .filter(income ->
+                        Objects.equals(income.getDate().getMonth().getValue(), Month.SEPTEMBER.getValue())
+                                && Objects.equals(income.getDate().getYear(), Year.of(2022).getValue()))
+                .collect(Collectors.toList());
+
+        when(repository.findByMonth(9, 2022)).thenReturn(matchers);
+        final List<ExpenseResponse> incomeResponseList = service.findByMonth(month, year);
+        assertEquals(1, incomeResponseList.size());
     }
 
 }

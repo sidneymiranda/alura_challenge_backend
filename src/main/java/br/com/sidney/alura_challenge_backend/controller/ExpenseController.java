@@ -2,6 +2,7 @@ package br.com.sidney.alura_challenge_backend.controller;
 
 import br.com.sidney.alura_challenge_backend.dto.ExpenseRequest;
 import br.com.sidney.alura_challenge_backend.dto.ExpenseResponse;
+import br.com.sidney.alura_challenge_backend.dto.IncomeResponse;
 import br.com.sidney.alura_challenge_backend.service.ExpenseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -43,6 +44,11 @@ public class ExpenseController {
         return expense.isPresent()
                 ? ResponseEntity.ok(this.service.findById(id))
                 : ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/{year}/{month}")
+    public ResponseEntity<List<ExpenseResponse>> findByMonth(@PathVariable String year, @PathVariable String month) {
+        return ResponseEntity.ok().body(this.service.findByMonth(month, year));
     }
 
     @PutMapping("{id}")

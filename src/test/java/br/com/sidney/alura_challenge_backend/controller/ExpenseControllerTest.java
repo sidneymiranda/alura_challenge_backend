@@ -16,6 +16,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import java.time.Month;
+import java.time.Year;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -46,14 +48,15 @@ class ExpenseControllerTest {
     @BeforeAll
     static void setup() {
         expenseRequest = ExpenseRequest.builder()
-                .date("11/08/22 12:08")
+                .date("11/08/22")
                 .value("985.56")
                 .description("Cleaning products")
+                .description("Dwelling house")
                 .build();
 
         ExpenseResponse expense = new ExpenseResponse();
         expense.setId("1");
-        expense.setDate("30/08/22 10:08");
+        expense.setDate("30/08/2022");
         expense.setValue("65000.00");
         expense.setDescription("Fuel expense");
         expense.setCategory("Transport");
@@ -61,7 +64,7 @@ class ExpenseControllerTest {
 
         expense = new ExpenseResponse();
         expense.setId("2");
-        expense.setDate("11/08/22 12:08");
+        expense.setDate("11/08/2022");
         expense.setValue("985.56");
         expense.setDescription("Cleaning products");
         expense.setCategory("Dwelling house");
@@ -69,9 +72,17 @@ class ExpenseControllerTest {
 
         expense = new ExpenseResponse();
         expense.setId("3");
-        expense.setDate("11/08/22 12:08");
+        expense.setDate("11/08/2022");
         expense.setValue("1085.56");
         expense.setDescription("Cloud Microservices Course");
+        expense.setCategory("Education");
+        expenses.add(expense);
+
+        expense = new ExpenseResponse();
+        expense.setId("4");
+        expense.setDate("11/12/2022");
+        expense.setValue("345.00");
+        expense.setDescription("Java Streams Course");
         expense.setCategory("Education");
         expenses.add(expense);
     }
@@ -95,7 +106,7 @@ class ExpenseControllerTest {
     }
 
     @Test
-    @DisplayName("Shouldn't create a new income and return the HTTP status code BAD REQUEST (400)")
+    @DisplayName("Shouldn't create a new expense and return the HTTP status code BAD REQUEST (400)")
     void whenDescriptionExpenseIsNull_thenTBadRequest() throws Exception {
        mockMvc.perform(post("/api/v1/expenses")
                         .content(mapper.writeValueAsString(expenseRequest.builder().description(null).build()))
@@ -106,7 +117,7 @@ class ExpenseControllerTest {
     }
 
     @Test
-    @DisplayName("Shouldn't create a new income and return the HTTP status code BAD REQUEST (400)")
+    @DisplayName("Shouldn't create a new expense and return the HTTP status code BAD REQUEST (400)")
     void whenValueExpenseIsNull_thenTBadRequest() throws Exception {
        mockMvc.perform(post("/api/v1/expenses")
                         .content(mapper.writeValueAsString(expenseRequest.builder().value(null).build()))
@@ -117,7 +128,7 @@ class ExpenseControllerTest {
     }
 
     @Test
-    @DisplayName("Shouldn't create a new income and return the HTTP status code BAD REQUEST (400)")
+    @DisplayName("Shouldn't create a new expense and return the HTTP status code BAD REQUEST (400)")
     void whenDateExpenseIsNull_thenTBadRequest() throws Exception {
        mockMvc.perform(post("/api/v1/expenses")
                         .content(mapper.writeValueAsString(expenseRequest.builder().date(null).build()))
@@ -128,18 +139,18 @@ class ExpenseControllerTest {
     }
 
     @Test
-    @DisplayName("Should return the HTTP status code OK (200) and income list")
+    @DisplayName("Should return the HTTP status code OK (200) and expense list")
     void getAll() throws Exception {
         when(expenseService.getAll(Optional.empty())).thenReturn(expenses);
 
         mockMvc.perform(get("/api/v1/expenses"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", Matchers.hasSize(3)))
+                .andExpect(jsonPath("$", Matchers.hasSize(4)))
                 .andExpect(jsonPath("$[0].description", Matchers.equalTo("Fuel expense")));
     }
 
     @Test
-    @DisplayName("Should return the HTTP status code OK (200) and income match list")
+    @DisplayName("Should return the HTTP status code OK (200) and expense match list")
     void getAllByDescription() throws Exception {
         String param = "microservices";
         List<ExpenseResponse> filteredList = expenses.stream()
@@ -154,7 +165,7 @@ class ExpenseControllerTest {
     }
 
     @Test
-    @DisplayName("Should return the HTTP status code OK (200) and income by id")
+    @DisplayName("Should return the HTTP status code OK (200) and expense by id")
     void findById() throws Exception {
         when(expenseService.findById("3")).thenReturn(Optional.of(expenses.get(2)));
 
@@ -165,7 +176,7 @@ class ExpenseControllerTest {
     }
 
     @Test
-    @DisplayName("Should delete income by id")
+    @DisplayName("Should delete expense by id")
     void deleteById() throws Exception {
         doNothing().when(expenseService).delete("1");
 
@@ -174,7 +185,7 @@ class ExpenseControllerTest {
     }
 
     @Test
-    @DisplayName("Should update income")
+    @DisplayName("Should update expense")
     void update() throws Exception {
         expenseRequest = ExpenseRequest.builder()
                 .description("BMW")
@@ -198,5 +209,23 @@ class ExpenseControllerTest {
                 .andExpect(jsonPath("$.id", Matchers.equalTo("1")))
                 .andExpect(jsonPath("$.value", Matchers.equalTo("65000.00")))
                 .andExpect(jsonPath("$.description", Matchers.equalTo("BMW")));
+    }
+
+    @Test
+    @DisplayName("Should return expense list for the same month")
+    void findByMonth() throws Exception {
+        String month = "12";
+        String year = "2022";
+
+        List<ExpenseResponse> matchers = expenses.stream()
+                .filter(expense ->
+                        expense.getDate().substring(3, 5).contains(String.valueOf(Month.DECEMBER.getValue()))
+                                && expense.getDate().substring(6).contains(Year.of(2022).toString()))
+                .collect(Collectors.toList());
+
+        when(expenseService.findByMonth(month, year)).thenReturn(matchers);
+        mockMvc.perform(get("/api/v1/expenses/{year}/{month}", year, month))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", Matchers.hasSize(1)));
     }
 }

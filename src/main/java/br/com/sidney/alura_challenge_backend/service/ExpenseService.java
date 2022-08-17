@@ -4,7 +4,6 @@ import br.com.sidney.alura_challenge_backend.dto.ExpenseRequest;
 import br.com.sidney.alura_challenge_backend.dto.ExpenseResponse;
 import br.com.sidney.alura_challenge_backend.dto.IncomeResponse;
 import br.com.sidney.alura_challenge_backend.model.Expense;
-import br.com.sidney.alura_challenge_backend.model.Income;
 import br.com.sidney.alura_challenge_backend.repository.ExpenseRepository;
 import br.com.sidney.alura_challenge_backend.utils.DateUtils;
 import org.springframework.beans.BeanUtils;
@@ -53,6 +52,13 @@ public class ExpenseService {
 
     public Optional<ExpenseResponse> findById(String id) {
         return this.repository.findById(Long.parseLong(id)).map(ExpenseResponse::new);
+    }
+
+    public List<ExpenseResponse> findByMonth(String month, String year) {
+        return this.repository.findByMonth(Integer.parseInt(month), Integer.parseInt(year))
+                .stream()
+                .map(ExpenseResponse::new)
+                .collect(Collectors.toList());
     }
 
     public ExpenseResponse update(String id, ExpenseRequest expenseRequest) {
