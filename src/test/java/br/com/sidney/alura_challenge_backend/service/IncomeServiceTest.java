@@ -9,10 +9,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import javax.validation.ValidationException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.time.Month;
+import java.time.Year;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -239,5 +238,21 @@ class IncomeServiceTest {
                 assertThrows(NoSuchElementException.class, () -> service.delete("32"));
 
         assertEquals("Income not exist by ID 32", validationException.getMessage());
+    }
+
+    @Test
+    @DisplayName("Should return incomes from the same month")
+    void whenFindByMonth_thenReturnIncomesForTheMonthInformed() {
+        String month = "11";
+        String year = "2022";
+        List<Income> matchers = incomes.stream()
+                .filter(income ->
+                        Objects.equals(income.getDate().getMonth().getValue(), Month.NOVEMBER.getValue())
+                        && Objects.equals(income.getDate().getYear(), Year.of(2022).getValue()))
+                .collect(Collectors.toList());
+
+        when(repository.findByMonth(11, 2022)).thenReturn(matchers);
+        final List<IncomeResponse> incomeResponseList = service.findByMonth(month, year);
+        assertEquals(3, incomeResponseList.size());
     }
 }

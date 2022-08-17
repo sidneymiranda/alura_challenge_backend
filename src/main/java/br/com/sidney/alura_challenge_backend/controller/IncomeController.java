@@ -37,6 +37,11 @@ public class IncomeController {
         return ResponseEntity.ok().body(this.service.getAll(description));
     }
 
+    @GetMapping("/{year}/{month}")
+    public ResponseEntity<List<IncomeResponse>> getAll(@PathVariable String year, @PathVariable String month) {
+        return ResponseEntity.ok().body(this.service.findByMonth(month, year));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<?> findById(@PathVariable String id) {
         final Optional<IncomeResponse> income = this.service.findById(id);

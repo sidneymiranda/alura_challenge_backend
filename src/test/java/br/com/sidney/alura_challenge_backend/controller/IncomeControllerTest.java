@@ -2,6 +2,7 @@ package br.com.sidney.alura_challenge_backend.controller;
 
 import br.com.sidney.alura_challenge_backend.dto.IncomeRequest;
 import br.com.sidney.alura_challenge_backend.dto.IncomeResponse;
+import br.com.sidney.alura_challenge_backend.model.Income;
 import br.com.sidney.alura_challenge_backend.service.IncomeService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matchers;
@@ -16,9 +17,9 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.time.Month;
+import java.time.Year;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -46,35 +47,35 @@ class IncomeControllerTest {
     @BeforeAll
     static void setup() {
         incomeRequest = IncomeRequest.builder()
-                .date("11/08/22 12:08")
+                .date("11/08/2022")
                 .value("985.56")
                 .description("Salary")
                 .build();
 
         IncomeResponse income = new IncomeResponse();
         income.setId("1");
-        income.setDate("30/08/22 10:08");
+        income.setDate("30/08/2022");
         income.setValue("65000.00");
         income.setDescription("Car sold");
         incomes.add(income);
 
         income = new IncomeResponse();
         income.setId("2");
-        income.setDate("11/08/22 12:08");
+        income.setDate("11/08/2022");
         income.setValue("985.56");
         income.setDescription("Salary");
         incomes.add(income);
 
         income = new IncomeResponse();
         income.setId("3");
-        income.setDate("11/08/22 12:08");
+        income.setDate("11/08/2022");
         income.setValue("1085.56");
         income.setDescription("Service provided");
         incomes.add(income);
 
         income = new IncomeResponse();
         income.setId("2");
-        income.setDate("71/11/22 11:08");
+        income.setDate("07/11/2022");
         income.setValue("2985.56");
         income.setDescription("Salary");
         incomes.add(income);
@@ -151,6 +152,24 @@ class IncomeControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.hasSize(4)))
                 .andExpect(jsonPath("$[0].description", Matchers.equalTo("Car sold")));
+    }
+
+    @Test
+    @DisplayName("Should return income list for the same month")
+    void findByMonth() throws Exception {
+        String month = "11";
+        String year = "2022";
+
+        List<IncomeResponse> matchers = incomes.stream()
+                .filter(income ->
+                        income.getDate().substring(3, 5).contains(String.valueOf(Month.NOVEMBER.getValue()))
+                                && income.getDate().substring(6).contains(Year.of(2022).toString()))
+                .collect(Collectors.toList());
+
+        when(incomeService.findByMonth(month,year)).thenReturn(matchers);
+        mockMvc.perform(get("/api/v1/incomes/{year}/{month}", year, month))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", Matchers.hasSize(1)));
     }
 
     @Test
