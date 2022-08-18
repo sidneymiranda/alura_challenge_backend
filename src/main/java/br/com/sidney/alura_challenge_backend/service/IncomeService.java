@@ -48,8 +48,8 @@ public class IncomeService {
                 .collect(Collectors.toList());
     }
 
-    public List<IncomeResponse> findByMonth(String month, String year) {
-        return this.repository.findByMonth(Integer.parseInt(month), Integer.parseInt(year))
+    public List<IncomeResponse> findByMonth(Integer year, Integer month) {
+        return this.repository.findByMonth(year, month)
                 .stream()
                 .map(IncomeResponse::new)
                 .collect(Collectors.toList());

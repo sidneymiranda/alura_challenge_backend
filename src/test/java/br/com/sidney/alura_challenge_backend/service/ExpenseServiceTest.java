@@ -236,16 +236,15 @@ class ExpenseServiceTest {
     @Test
     @DisplayName("Should return expense from the same month")
     void whenFindByMonth_thenReturnExpensesForTheMonthInformed() {
-        String month = "09";
-        String year = "2022";
+        Integer year = 2022, month = 9;
         List<Expense> matchers = expenses.stream()
                 .filter(income ->
                         Objects.equals(income.getDate().getMonth().getValue(), Month.SEPTEMBER.getValue())
-                                && Objects.equals(income.getDate().getYear(), Year.of(2022).getValue()))
+                                && Objects.equals(income.getDate().getYear(), Year.of(year).getValue()))
                 .collect(Collectors.toList());
 
-        when(repository.findByMonth(9, 2022)).thenReturn(matchers);
-        final List<ExpenseResponse> incomeResponseList = service.findByMonth(month, year);
+        when(repository.findByMonth(year, month)).thenReturn(matchers);
+        final List<ExpenseResponse> incomeResponseList = service.findByMonth(year, month);
         assertEquals(1, incomeResponseList.size());
     }
 

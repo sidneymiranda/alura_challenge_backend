@@ -2,7 +2,6 @@ package br.com.sidney.alura_challenge_backend.controller;
 
 import br.com.sidney.alura_challenge_backend.dto.IncomeRequest;
 import br.com.sidney.alura_challenge_backend.dto.IncomeResponse;
-import br.com.sidney.alura_challenge_backend.model.Income;
 import br.com.sidney.alura_challenge_backend.service.IncomeService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matchers;
@@ -19,7 +18,9 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import java.time.Month;
 import java.time.Year;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -31,7 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest
-@ContextConfiguration(classes = {IncomeController.class})
+@ContextConfiguration(classes = { IncomeController.class })
 @DisplayName("Income Controller REST Endpoint Testing With MockMvc")
 class IncomeControllerTest {
 
@@ -100,7 +101,7 @@ class IncomeControllerTest {
 
     @Test
     @DisplayName("Shouldn't create a new income and return the HTTP status code BAD REQUEST (400)")
-    void whenDescriptionIncomeIsNull_thenTBadRequest() throws Exception {
+    void whenDescriptionIncomeIsNull_thenBadRequest() throws Exception {
         mockMvc.perform(post("/api/v1/incomes")
                         .content(mapper.writeValueAsString(incomeRequest.builder().description(null).build()))
                         .contentType(MediaType.APPLICATION_JSON)
@@ -110,7 +111,7 @@ class IncomeControllerTest {
 
     @Test
     @DisplayName("Shouldn't create a new income and return the HTTP status code BAD REQUEST (400)")
-    void whenValueIncomeIsNull_thenTBadRequest() throws Exception {
+    void whenValueIncomeIsNull_thenBadRequest() throws Exception {
        mockMvc.perform(post("/api/v1/incomes")
                         .content(mapper.writeValueAsString(incomeRequest.builder().value(null).build()))
                         .contentType(MediaType.APPLICATION_JSON)
@@ -120,7 +121,7 @@ class IncomeControllerTest {
 
     @Test
     @DisplayName("Shouldn't create a new income and return the HTTP status code BAD REQUEST (400)")
-    void whenDateIncomeIsNull_thenTBadRequest() throws Exception {
+    void whenDateIncomeIsNull_thenBadRequest() throws Exception {
         mockMvc.perform(post("/api/v1/incomes")
                         .content(mapper.writeValueAsString(incomeRequest.builder().date(null).build()))
                         .contentType(MediaType.APPLICATION_JSON)
@@ -157,16 +158,15 @@ class IncomeControllerTest {
     @Test
     @DisplayName("Should return income list for the same month")
     void findByMonth() throws Exception {
-        String month = "11";
-        String year = "2022";
+        Integer year = 2022, month = 11;
 
         List<IncomeResponse> matchers = incomes.stream()
                 .filter(income ->
                         income.getDate().substring(3, 5).contains(String.valueOf(Month.NOVEMBER.getValue()))
-                                && income.getDate().substring(6).contains(Year.of(2022).toString()))
+                                && income.getDate().substring(6).contains(Year.of(year).toString()))
                 .collect(Collectors.toList());
 
-        when(incomeService.findByMonth(month,year)).thenReturn(matchers);
+        when(incomeService.findByMonth(year, month)).thenReturn(matchers);
         mockMvc.perform(get("/api/v1/incomes/{year}/{month}", year, month))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.hasSize(1)));

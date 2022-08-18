@@ -2,7 +2,6 @@ package br.com.sidney.alura_challenge_backend.service;
 
 import br.com.sidney.alura_challenge_backend.dto.ExpenseRequest;
 import br.com.sidney.alura_challenge_backend.dto.ExpenseResponse;
-import br.com.sidney.alura_challenge_backend.dto.IncomeResponse;
 import br.com.sidney.alura_challenge_backend.model.Expense;
 import br.com.sidney.alura_challenge_backend.repository.ExpenseRepository;
 import br.com.sidney.alura_challenge_backend.utils.DateUtils;
@@ -54,8 +53,8 @@ public class ExpenseService {
         return this.repository.findById(Long.parseLong(id)).map(ExpenseResponse::new);
     }
 
-    public List<ExpenseResponse> findByMonth(String month, String year) {
-        return this.repository.findByMonth(Integer.parseInt(month), Integer.parseInt(year))
+    public List<ExpenseResponse> findByMonth(Integer year, Integer month) {
+        return this.repository.findByMonth(year, month)
                 .stream()
                 .map(ExpenseResponse::new)
                 .collect(Collectors.toList());

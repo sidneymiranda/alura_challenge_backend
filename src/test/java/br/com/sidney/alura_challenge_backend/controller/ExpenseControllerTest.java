@@ -32,7 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest
-@ContextConfiguration(classes = {ExpenseController.class})
+@ContextConfiguration(classes = { ExpenseController.class })
 @DisplayName("Expense Controller REST Endpoint Testing With MockMvc")
 class ExpenseControllerTest {
 
@@ -214,16 +214,15 @@ class ExpenseControllerTest {
     @Test
     @DisplayName("Should return expense list for the same month")
     void findByMonth() throws Exception {
-        String month = "12";
-        String year = "2022";
+        Integer year = 2022, month = 12;
 
         List<ExpenseResponse> matchers = expenses.stream()
                 .filter(expense ->
                         expense.getDate().substring(3, 5).contains(String.valueOf(Month.DECEMBER.getValue()))
-                                && expense.getDate().substring(6).contains(Year.of(2022).toString()))
+                                && expense.getDate().substring(6).contains(Year.of(year).toString()))
                 .collect(Collectors.toList());
 
-        when(expenseService.findByMonth(month, year)).thenReturn(matchers);
+        when(expenseService.findByMonth(year, month)).thenReturn(matchers);
         mockMvc.perform(get("/api/v1/expenses/{year}/{month}", year, month))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.hasSize(1)));

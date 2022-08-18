@@ -38,8 +38,8 @@ public class IncomeController {
     }
 
     @GetMapping("/{year}/{month}")
-    public ResponseEntity<List<IncomeResponse>> findByMonth(@PathVariable String year, @PathVariable String month) {
-        return ResponseEntity.ok().body(this.service.findByMonth(month, year));
+    public ResponseEntity<List<IncomeResponse>> findByMonth(@PathVariable Integer year, @PathVariable Integer month) {
+        return ResponseEntity.ok().body(this.service.findByMonth(year, month));
     }
 
     @GetMapping("/{id}")
