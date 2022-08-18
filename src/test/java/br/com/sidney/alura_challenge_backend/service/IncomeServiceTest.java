@@ -2,16 +2,20 @@ package br.com.sidney.alura_challenge_backend.service;
 
 import br.com.sidney.alura_challenge_backend.dto.IncomeRequest;
 import br.com.sidney.alura_challenge_backend.dto.IncomeResponse;
+import br.com.sidney.alura_challenge_backend.exceptions.ResourceNotFoundException;
+import br.com.sidney.alura_challenge_backend.exceptions.ValidationException;
 import br.com.sidney.alura_challenge_backend.model.Income;
 import br.com.sidney.alura_challenge_backend.repository.IncomeRepository;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import javax.validation.ValidationException;
 import java.time.Month;
 import java.time.Year;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -106,7 +110,7 @@ class IncomeServiceTest {
 
         final ValidationException validationException = assertThrows(ValidationException.class, () -> service.register(incomeRequest));
 
-        assertEquals("The income already registered for the informed month", validationException.getMessage());
+        assertEquals("Income already recorded this month", validationException.getMessage());
     }
 
     @Test
@@ -164,8 +168,8 @@ class IncomeServiceTest {
     void whenNoExistsIncome_thenThrowException() {
         String id = "10";
         when(repository.existsById(any(Long.class))).thenReturn(Boolean.FALSE);
-        final NoSuchElementException validationException =
-                assertThrows(NoSuchElementException.class, () -> service.delete(id));
+        final ResourceNotFoundException validationException =
+                assertThrows(ResourceNotFoundException.class, () -> service.delete(id));
 
         assertEquals("Income not exist by ID " + id, validationException.getMessage());
     }
@@ -220,8 +224,8 @@ class IncomeServiceTest {
         when(repository.existsById(32L)).thenReturn(false);
         doNothing().when(repository).deleteById(any(Long.class));
 
-        final NoSuchElementException validationException =
-                assertThrows(NoSuchElementException.class, () -> service.delete("32"));
+        final ResourceNotFoundException validationException =
+                assertThrows(ResourceNotFoundException.class, () -> service.delete("32"));
 
         assertEquals("Income not exist by ID 32", validationException.getMessage());
     }

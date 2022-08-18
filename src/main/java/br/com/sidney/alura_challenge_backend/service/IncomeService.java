@@ -2,6 +2,8 @@ package br.com.sidney.alura_challenge_backend.service;
 
 import br.com.sidney.alura_challenge_backend.dto.IncomeRequest;
 import br.com.sidney.alura_challenge_backend.dto.IncomeResponse;
+import br.com.sidney.alura_challenge_backend.exceptions.ResourceNotFoundException;
+import br.com.sidney.alura_challenge_backend.exceptions.ValidationException;
 import br.com.sidney.alura_challenge_backend.model.Income;
 import br.com.sidney.alura_challenge_backend.repository.IncomeRepository;
 import br.com.sidney.alura_challenge_backend.utils.DateUtils;
@@ -9,10 +11,8 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.validation.ValidationException;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -27,7 +27,7 @@ public class IncomeService {
 
     public IncomeResponse register(IncomeRequest request) {
         if(validateRecordDate(request.getDescription(), request.getDate())) {
-            throw new ValidationException("The income already registered for the informed month");
+            throw new ValidationException("Income already recorded this month");
         }
 
         Income income = new Income(request);
@@ -61,7 +61,7 @@ public class IncomeService {
 
     public void delete(String id) {
         if (!isPresent(id))
-            throw new NoSuchElementException("Income not exist by ID " + id);
+            throw new ResourceNotFoundException("Income not exist by ID " + id);
 
         this.repository.deleteById(Long.parseLong(id));
     }
@@ -91,7 +91,7 @@ public class IncomeService {
             throw new ValidationException("Income cannot be updated, was registered in the current month");
 
         Income income = this.repository.findById(Long.parseLong(id))
-                .orElseThrow(() -> new NoSuchElementException(""));
+                .orElseThrow(() -> new ResourceNotFoundException("Income not exist by ID " + id));
 
         BeanUtils.copyProperties(incomeRequest, income);
 

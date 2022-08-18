@@ -2,6 +2,8 @@ package br.com.sidney.alura_challenge_backend.service;
 
 import br.com.sidney.alura_challenge_backend.dto.ExpenseRequest;
 import br.com.sidney.alura_challenge_backend.dto.ExpenseResponse;
+import br.com.sidney.alura_challenge_backend.exceptions.ResourceNotFoundException;
+import br.com.sidney.alura_challenge_backend.exceptions.ValidationException;
 import br.com.sidney.alura_challenge_backend.model.Expense;
 import br.com.sidney.alura_challenge_backend.repository.ExpenseRepository;
 import br.com.sidney.alura_challenge_backend.utils.DateUtils;
@@ -9,10 +11,8 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.validation.ValidationException;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -27,7 +27,7 @@ public class ExpenseService {
 
     public ExpenseResponse register(ExpenseRequest request) {
         if(validateRecordDate(request.getDescription(), request.getDate())) {
-            throw new ValidationException("The expense already registered for the informed month");
+            throw new ValidationException("Expense already recorded this month");
         }
 
         Expense income = new Expense(request);
@@ -65,7 +65,7 @@ public class ExpenseService {
             throw new ValidationException("Expense cannot be updated, was registered in the current month");
 
         Expense expense = this.repository.findById(Long.parseLong(id))
-                .orElseThrow(() -> new NoSuchElementException(""));
+                .orElseThrow(() -> new ResourceNotFoundException("Expense not exist by ID " + id));
 
         BeanUtils.copyProperties(expenseRequest, expense);
 
@@ -74,7 +74,7 @@ public class ExpenseService {
 
     public void delete(String id) {
         if (!isPresent(id))
-            throw new NoSuchElementException("Expense not exist by ID " + id);
+            throw new ResourceNotFoundException("Expense not exist by ID " + id);
 
         this.repository.deleteById(Long.parseLong(id));
     }

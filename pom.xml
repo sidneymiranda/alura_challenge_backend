@@ -11,8 +11,8 @@
     <groupId>br.com.sidney</groupId>
     <artifactId>alura_challenge_backend</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>alura_challenge_backend</name>
-    <description>alura_challenge_backend</description>
+    <name>account_manager</name>
+    <description>Alura Challenge API REST</description>
     <properties>
         <java.version>11</java.version>
         <org.mapstruct.version>1.5.2.Final</org.mapstruct.version>

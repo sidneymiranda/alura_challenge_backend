@@ -3,6 +3,8 @@ package br.com.sidney.alura_challenge_backend.service;
 import br.com.sidney.alura_challenge_backend.dto.ExpenseRequest;
 import br.com.sidney.alura_challenge_backend.dto.ExpenseResponse;
 import br.com.sidney.alura_challenge_backend.enums.Category;
+import br.com.sidney.alura_challenge_backend.exceptions.ResourceNotFoundException;
+import br.com.sidney.alura_challenge_backend.exceptions.ValidationException;
 import br.com.sidney.alura_challenge_backend.model.Expense;
 import br.com.sidney.alura_challenge_backend.repository.ExpenseRepository;
 import br.com.sidney.alura_challenge_backend.utils.DateUtils;
@@ -10,7 +12,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import javax.validation.ValidationException;
 import java.math.BigDecimal;
 import java.time.Month;
 import java.time.Year;
@@ -115,7 +116,7 @@ class ExpenseServiceTest {
         final ValidationException validationException = assertThrows(ValidationException.class,
                 () -> service.register(request));
 
-        assertEquals("The expense already registered for the informed month", validationException.getMessage());
+        assertEquals("Expense already recorded this month", validationException.getMessage());
     }
 
     @Test
@@ -227,8 +228,8 @@ class ExpenseServiceTest {
         when(repository.existsById(2L)).thenReturn(false);
         doNothing().when(repository).deleteById(any(Long.class));
 
-        final NoSuchElementException validationException =
-                assertThrows(NoSuchElementException.class, () -> service.delete("2"));
+        final ResourceNotFoundException validationException =
+                assertThrows(ResourceNotFoundException.class, () -> service.delete("2"));
 
         assertEquals("Expense not exist by ID 2", validationException.getMessage());
     }
