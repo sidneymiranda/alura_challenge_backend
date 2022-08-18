@@ -24,7 +24,7 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long> {
             nativeQuery = true)
     BigDecimal amountByMonth(int year, int month);
 
-    @Query(value = "SELECT NEW br.com.sidney.alura_challenge_backend.vo.CategoryVO(e.category, SUM(e.value)) " +
+    @Query(value = "SELECT NEW br.com.sidney.alura_challenge_backend.dto.CategoryResponse(e.category, SUM(e.value)) " +
             "FROM Expense e WHERE YEAR(e.date) = ?1 AND MONTH(e.date) = ?2 GROUP BY e.category")
     List<CategoryResponse> amountByCategory(int year, int month);
 }
