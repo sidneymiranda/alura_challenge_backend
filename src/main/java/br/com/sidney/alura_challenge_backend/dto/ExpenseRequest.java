@@ -9,13 +9,13 @@ import javax.validation.constraints.NotBlank;
 @Builder
 public class ExpenseRequest {
 
-    @NotBlank(message = "Description is required")
+    @NotBlank(message = "must not be blank")
     private String description;
 
-    @NotBlank(message = "Value is required")
+    @NotBlank(message = "must not be blank")
     private String value;
 
-    @NotBlank(message = "Date is required")
+    @NotBlank(message = "must not be blank")
     private String date;
 
     private String category;

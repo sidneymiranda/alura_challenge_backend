@@ -23,13 +23,15 @@ public class ResumeService {
     public ResumeResponse getResume(Integer year, Integer month) {
         BigDecimal amountIncome = this.incomeRepository.amountByMonth(year, month);
         BigDecimal amountExpense = this.expenseRepository.amountByMonth(year, month);
-        BigDecimal endBalance = amountIncome.subtract(amountExpense);
         List<CategoryResponse> totalByCategory = this.expenseRepository.amountByCategory(year, month);
+
+        amountIncome = amountIncome == null ? BigDecimal.ZERO : amountIncome;
+        amountExpense = amountExpense == null ? BigDecimal.ZERO : amountExpense;
 
         return ResumeResponse.builder()
                 .amountIncome(amountIncome)
                 .amountExpense(amountExpense)
-                .endBalance(endBalance)
+                .endBalance(amountIncome.subtract(amountExpense))
                 .totalByCategory(totalByCategory)
                 .build();
     }

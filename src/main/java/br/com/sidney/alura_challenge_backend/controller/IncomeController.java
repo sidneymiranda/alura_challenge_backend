@@ -3,8 +3,11 @@ package br.com.sidney.alura_challenge_backend.controller;
 import br.com.sidney.alura_challenge_backend.dto.IncomeRequest;
 import br.com.sidney.alura_challenge_backend.dto.IncomeResponse;
 import br.com.sidney.alura_challenge_backend.service.IncomeService;
+import br.com.sidney.alura_challenge_backend.validators.interfaces.Month;
+import br.com.sidney.alura_challenge_backend.validators.interfaces.Year;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -14,6 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
+@Validated
 @RequestMapping("/api/v1/incomes")
 public class IncomeController {
 
@@ -38,7 +42,9 @@ public class IncomeController {
     }
 
     @GetMapping("/{year}/{month}")
-    public ResponseEntity<List<IncomeResponse>> findByMonth(@PathVariable Integer year, @PathVariable Integer month) {
+    public ResponseEntity<List<IncomeResponse>> findByMonth(
+            @PathVariable @Year Integer year,
+            @PathVariable @Month Integer month) {
         return ResponseEntity.ok().body(this.service.findByMonth(year, month));
     }
 
