@@ -5,6 +5,7 @@ import br.com.sidney.alura_challenge_backend.enums.Category;
 import br.com.sidney.alura_challenge_backend.utils.DateUtils;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
@@ -16,6 +17,7 @@ import java.time.LocalDate;
 @Entity
 @Getter
 @Setter
+@NoArgsConstructor
 @EqualsAndHashCode
 public class Expense implements Serializable {
 
@@ -35,8 +37,6 @@ public class Expense implements Serializable {
     @Enumerated(EnumType.STRING)
     @Column(length = 20)
     private Category category;
-
-    public Expense() { }
 
     public Expense(ExpenseRequest request) {
         this.description = request.getDescription();

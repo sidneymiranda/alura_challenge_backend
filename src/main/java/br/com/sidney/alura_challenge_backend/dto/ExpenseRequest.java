@@ -1,5 +1,6 @@
 package br.com.sidney.alura_challenge_backend.dto;
 
+import br.com.sidney.alura_challenge_backend.validators.interfaces.Date;
 import lombok.Builder;
 import lombok.Data;
 
@@ -15,6 +16,7 @@ public class ExpenseRequest {
     @NotBlank(message = "must not be blank")
     private String value;
 
+    @Date
     @NotBlank(message = "must not be blank")
     private String date;
 

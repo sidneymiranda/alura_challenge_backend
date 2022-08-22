@@ -3,20 +3,16 @@ package br.com.sidney.alura_challenge_backend.dto;
 import br.com.sidney.alura_challenge_backend.model.Income;
 import br.com.sidney.alura_challenge_backend.utils.DateUtils;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 public class IncomeResponse {
 
     private String id;
-
     private String description;
-
     private String value;
-
     private String date;
-
-    public IncomeResponse() {
-    }
 
     public IncomeResponse(Income income) {
         this.id = String.valueOf(income.getId());

@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -31,8 +30,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest
-@ContextConfiguration(classes = { ExpenseController.class })
+@WebMvcTest(controllers = ExpenseController.class)
+//@ContextConfiguration(classes = { ExpenseController.class })
 @DisplayName("Expense Controller REST Endpoint Testing With MockMvc")
 class ExpenseControllerTest {
 
@@ -48,7 +47,7 @@ class ExpenseControllerTest {
     @BeforeAll
     static void setup() {
         expenseRequest = ExpenseRequest.builder()
-                .date("11/08/22")
+                .date("11/08/2022")
                 .value("985.56")
                 .description("Cleaning products")
                 .description("Dwelling house")
@@ -189,14 +188,14 @@ class ExpenseControllerTest {
     void update() throws Exception {
         expenseRequest = ExpenseRequest.builder()
                 .description("BMW")
-                .date("30/08/22 10:08")
+                .date("30/08/2022")
                 .value("65000.00")
                 .build();
 
         ExpenseResponse response = new ExpenseResponse();
         response.setId("1");
         response.setDescription("BMW");
-        response.setDate("30/08/22 10:08");
+        response.setDate("30/08/2022");
         response.setValue("65000.00");
 
         when(expenseService.update("1", expenseRequest)).thenReturn(response);
@@ -226,5 +225,18 @@ class ExpenseControllerTest {
         mockMvc.perform(get("/api/v1/expenses/{year}/{month}", year, month))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.hasSize(1)));
+    }
+
+    @Test
+    @DisplayName("Should return the HTTP status code OK (400)")
+    void whenSaveWithIncorrectDate_thenBadRequest() throws Exception {
+        mockMvc.perform(post("/api/v1/expenses")
+                        .content(mapper.writeValueAsString(ExpenseRequest.builder()
+                                .description("iFood")
+                                .value("95.50")
+                                .date("22/08/22").build()))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                        .andExpect(status().isBadRequest());
     }
 }

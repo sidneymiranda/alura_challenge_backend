@@ -9,7 +9,7 @@ public class MonthValidator implements ConstraintValidator<Month, Integer> {
     /**
      * @param value
      * @param context
-     * @return
+     * @return true if month is valid
      */
     @Override
     public boolean isValid(Integer value, ConstraintValidatorContext context) {

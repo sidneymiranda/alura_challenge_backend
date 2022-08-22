@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.Month;
 import java.time.Year;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -244,5 +245,18 @@ class IncomeServiceTest {
         when(repository.findByMonth(year, month)).thenReturn(matchers);
         final List<IncomeResponse> incomeResponseList = service.findByMonth(year, month);
         assertEquals(3, incomeResponseList.size());
+    }
+
+    @Test
+    @DisplayName("Should not save a new expense with incorrect date")
+    void whenSaveWithIncorrectDate_thenBadRequest() {
+        final DateTimeParseException validationException = assertThrows(
+                DateTimeParseException.class,
+                () -> service.register(IncomeRequest.builder()
+                        .description("Salary")
+                        .value("3095.50")
+                        .date("01/08/22").build()));
+
+        assertEquals("Text '01/08/22' could not be parsed at index 6", validationException.getMessage());
     }
 }

@@ -4,6 +4,7 @@ import br.com.sidney.alura_challenge_backend.dto.IncomeRequest;
 import br.com.sidney.alura_challenge_backend.dto.IncomeResponse;
 import br.com.sidney.alura_challenge_backend.service.IncomeService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -14,7 +15,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 
 import java.time.Month;
 import java.time.Year;
@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
@@ -47,6 +46,8 @@ class IncomeControllerTest {
 
     @BeforeAll
     static void setup() {
+        mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+
         incomeRequest = IncomeRequest.builder()
                 .date("11/08/2022")
                 .value("985.56")
@@ -88,15 +89,17 @@ class IncomeControllerTest {
     void register() throws Exception {
         IncomeResponse response = incomes.get(1);
         when(incomeService.register(any(IncomeRequest.class))).thenReturn(response);
-        MvcResult mvcResult = mockMvc.perform(post("/api/v1/incomes")
-                        .content(mapper.writeValueAsString(incomeRequest))
+        mockMvc.perform(post("/api/v1/incomes")
+                        .content(mapper.writeValueAsString(IncomeRequest.builder()
+                                .description("Salary")
+                                .value("985.56")
+                                .date("11/08/2022")
+                                .build()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                         .andExpect(status().isCreated())
                         .andExpect(jsonPath("$.description", Matchers.equalTo("Salary")))
                 .andReturn();
-        String location = mvcResult.getResponse().getHeader("location");
-        assertNotNull(location);
     }
 
     @Test
@@ -217,5 +220,18 @@ class IncomeControllerTest {
                 .andExpect(jsonPath("$.id", Matchers.equalTo("1")))
                 .andExpect(jsonPath("$.value", Matchers.equalTo("65000.00")))
                 .andExpect(jsonPath("$.description", Matchers.equalTo("BMW")));
+    }
+
+    @Test
+    @DisplayName("Should return the HTTP status code OK (400)")
+    void whenSaveWithIncorrectDate_thenBadRequest() throws Exception {
+        mockMvc.perform(post("/api/v1/incomes")
+                        .content(mapper.writeValueAsString(IncomeRequest.builder()
+                                .description("Salary")
+                                .value("3400.00")
+                                .date("30/07/22").build()))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
     }
 }

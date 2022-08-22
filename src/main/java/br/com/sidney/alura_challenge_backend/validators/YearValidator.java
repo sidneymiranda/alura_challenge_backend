@@ -9,7 +9,7 @@ public class YearValidator implements ConstraintValidator<Year, Integer> {
     /**
      * @param value
      * @param context
-     * @return
+     * @return true if year is valid
      */
     @Override
     public boolean isValid(Integer value, ConstraintValidatorContext context) {

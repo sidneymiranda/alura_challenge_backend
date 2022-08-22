@@ -1,5 +1,6 @@
 package br.com.sidney.alura_challenge_backend.dto;
 
+import br.com.sidney.alura_challenge_backend.validators.interfaces.Date;
 import lombok.Builder;
 import lombok.Data;
 
@@ -9,13 +10,14 @@ import javax.validation.constraints.NotBlank;
 @Builder
 public class IncomeRequest {
 
-    @NotBlank(message = "Description is required")
+    @NotBlank(message = "must not be blank")
     private String description;
 
-    @NotBlank(message = "Value is required")
+    @NotBlank(message = "must not be blank")
     private String value;
 
-    @NotBlank(message = "Date is required")
+    @Date
+    @NotBlank(message = "must not be blank")
     private String date;
 
 }

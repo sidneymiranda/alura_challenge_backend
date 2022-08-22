@@ -3,6 +3,7 @@ package br.com.sidney.alura_challenge_backend.exceptions.handler;
 import br.com.sidney.alura_challenge_backend.exceptions.ResourceNotFoundException;
 import br.com.sidney.alura_challenge_backend.exceptions.ValidationException;
 import br.com.sidney.alura_challenge_backend.exceptions.model.ApiError;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -18,7 +19,6 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import javax.validation.ConstraintViolationException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -33,15 +33,9 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 
-    /**
-     * Customize the response for ResourceNotFoundException.
-     *
-     * @param ex    the exception
-     * @return a {@Code ResponseEntity} instance
-     */
     @ExceptionHandler(ResourceNotFoundException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<Object> handleResourceNotFoundException(ResourceNotFoundException ex) {
+    public ResponseEntity<Object> handleResourceNotFound(ResourceNotFoundException ex) {
         return ResponseEntityBuilder.build(ApiError
                 .builder()
                 .message("Resource Not Found")
@@ -51,15 +45,9 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
                 .build());
     }
 
-    /**
-     * Customize the response for ValidationException.
-     *
-     * @param ex    the exception
-     * @return a {@Code ResponseEntity} instance
-     */
     @ExceptionHandler(ValidationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<Object> handleValidationException(ValidationException ex) {
+    public ResponseEntity<Object> handleValidation(ValidationException ex) {
         return ResponseEntityBuilder.build(ApiError
                 .builder()
                 .message(HttpStatus.BAD_REQUEST.getReasonPhrase())
@@ -69,15 +57,9 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
                 .build());
     }
 
-    /**
-     * Customize the response for DateTimeParseException.
-     *
-     * @param ex    the exception
-     * @return a {@Code ResponseEntity} instance
-     */
     @ExceptionHandler(DateTimeParseException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<Object> handleDateTimeParseException(DateTimeParseException ex) {
+    public ResponseEntity<Object> handleDateTimeParse(DateTimeParseException ex) {
         return ResponseEntityBuilder.build(ApiError
                 .builder()
                 .message("Date pattern incorrect")
@@ -87,14 +69,8 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
                 .build());
     }
 
-    /**
-     * Customize the response for DataIntegrityViolationException.
-     *
-     * @param ex    the exception
-     * @return a {@Code ResponseEntity} instance
-     */
     @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<Object> handleDateTimeParseException(DataIntegrityViolationException ex) {
+    public ResponseEntity<Object> handleDateTimeParse(DataIntegrityViolationException ex) {
         return ResponseEntityBuilder.build(ApiError
                 .builder()
                 .message("Cannot parse date")
@@ -104,32 +80,20 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
                 .build());
     }
 
-    /**
-     * Customize the response for ConstraintViolationException.
-     *
-     * @param ex    the exception
-     * @return a {@Code ResponseEntity} instance
-     */
     @ExceptionHandler(ConstraintViolationException.class)
-    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<Object> handleConstraintViolation(ConstraintViolationException ex) {
         return ResponseEntityBuilder.build(ApiError
                 .builder()
                 .message("Constraint Violation")
-                .status(HttpStatus.UNPROCESSABLE_ENTITY.value())
+                .status(HttpStatus.BAD_REQUEST.value())
                 .timestamp(LocalDateTime.now())
                 .errors(Arrays.asList(ex.getMessage()))
                 .build());
     }
 
-    /**
-     * Customize the response for DataIntegrityViolationException.
-     *
-     * @param ex    the exception
-     * @return a {@Code ResponseEntity} instance
-     */
     @ExceptionHandler(NoSuchElementException.class)
-    public ResponseEntity<Object> handleDateTimeParseException(NoSuchElementException ex) {
+    public ResponseEntity<Object> handleDateTimeParse(NoSuchElementException ex) {
         return ResponseEntityBuilder.build(ApiError
                 .builder()
                 .message("No Such Element")
@@ -164,12 +128,12 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         List<String> details = ex.getBindingResult()
                 .getFieldErrors()
                 .stream()
-                .map(error -> error.getObjectName() + " : " + error.getDefaultMessage())
+                .map(DefaultMessageSourceResolvable::getDefaultMessage)
                 .collect(Collectors.toList());
 
         return ResponseEntityBuilder.build(ApiError
                 .builder()
-                .message("Bad Request")
+                .message(HttpStatus.BAD_REQUEST.getReasonPhrase())
                 .status(HttpStatus.BAD_REQUEST.value())
                 .timestamp(LocalDateTime.now())
                 .errors(details)
