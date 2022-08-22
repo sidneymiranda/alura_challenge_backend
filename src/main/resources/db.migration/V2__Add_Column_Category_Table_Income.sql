@@ -1,0 +1,1 @@
+ALTER TABLE IF EXISTS public.income ADD COLUMN category varchar(20);

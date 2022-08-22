@@ -1,0 +1,32 @@
+version: '3.4'
+
+services:
+  db:
+    image: postgres:12-alpine
+    container_name: account_manager_db
+    restart: always
+    env_file:
+      - ./database.dev.env
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./db-data:/var/lib/postgresql/data
+      - ./sql:/docker-entrypoint-initdb.d/:ro
+    networks:
+      - backend
+  api:
+    build: .
+    container_name: account-manager-api
+    env_file:
+      - ./api.dev.env
+    depends_on:
+      - db
+    networks:
+      - backend
+
+volumes:
+  db-data:
+
+networks:
+  backend:
+    driver: bridge
