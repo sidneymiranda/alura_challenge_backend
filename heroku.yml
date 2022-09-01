@@ -5,7 +5,5 @@ build:
     POSTGRES_DB: ${JDBC_DATABASE_URL}
     POSTGRES_USERNAME: ${JDBC_DATABASE_USERNAME}
     POSTGRES_PASSWORD: ${JDBC_DATABASE_PASSWORD}
-run:
-  web: java -jar account-manager.jar
 release:
   image: web
