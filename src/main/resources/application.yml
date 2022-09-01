@@ -3,3 +3,6 @@ spring:
     active: dev
   jpa:
     open-in-view: false
+
+jwt:
+  secret: sNH2ZIsXzxoDotwnDwQas6rQaNa0ezQozJXNSNn5mHX677uGPYIBnS8rx2kcADSW

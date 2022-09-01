@@ -2,6 +2,7 @@ package br.com.sidney.alura_challenge_backend.controller;
 
 import br.com.sidney.alura_challenge_backend.dto.ExpenseRequest;
 import br.com.sidney.alura_challenge_backend.dto.ExpenseResponse;
+import br.com.sidney.alura_challenge_backend.mocks.WithMockAdmin;
 import br.com.sidney.alura_challenge_backend.service.ExpenseService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matchers;
@@ -13,7 +14,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 
 import java.time.Month;
 import java.time.Year;
@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
@@ -31,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = ExpenseController.class)
-//@ContextConfiguration(classes = { ExpenseController.class })
+@WithMockAdmin
 @DisplayName("Expense Controller REST Endpoint Testing With MockMvc")
 class ExpenseControllerTest {
 
@@ -92,16 +91,13 @@ class ExpenseControllerTest {
     void whenExpenseValid_thenCreated() throws Exception {
         ExpenseResponse response = expenses.get(1);
         when(expenseService.register(any(ExpenseRequest.class))).thenReturn(response);
-        MvcResult mvcResult = mockMvc.perform(post("/api/v1/expenses")
+        mockMvc.perform(post("/api/v1/expenses")
                         .content(mapper.writeValueAsString(expenseRequest))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                         .andExpect(status().isCreated())
                         .andExpect(jsonPath("$.description", Matchers.equalTo("Cleaning products")))
-                        .andExpect(jsonPath("$.category", Matchers.equalTo("Dwelling house")))
-                .andReturn();
-        String location = mvcResult.getResponse().getHeader("location");
-        assertNotNull(location);
+                        .andExpect(jsonPath("$.category", Matchers.equalTo("Dwelling house")));
     }
 
     @Test
@@ -111,8 +107,7 @@ class ExpenseControllerTest {
                         .content(mapper.writeValueAsString(expenseRequest.builder().description(null).build()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
-                        .andExpect(status().isBadRequest())
-                        .andReturn();
+                        .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -122,8 +117,7 @@ class ExpenseControllerTest {
                         .content(mapper.writeValueAsString(expenseRequest.builder().value(null).build()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
-                        .andExpect(status().isBadRequest())
-                        .andReturn();
+                        .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -133,8 +127,7 @@ class ExpenseControllerTest {
                         .content(mapper.writeValueAsString(expenseRequest.builder().date(null).build()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
-                        .andExpect(status().isBadRequest())
-                        .andReturn();
+                        .andExpect(status().isBadRequest());
     }
 
     @Test

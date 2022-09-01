@@ -2,6 +2,7 @@ package br.com.sidney.alura_challenge_backend.controller;
 
 import br.com.sidney.alura_challenge_backend.dto.IncomeRequest;
 import br.com.sidney.alura_challenge_backend.dto.IncomeResponse;
+import br.com.sidney.alura_challenge_backend.mocks.WithMockAdmin;
 import br.com.sidney.alura_challenge_backend.service.IncomeService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -13,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.Month;
@@ -30,8 +30,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest
-@ContextConfiguration(classes = { IncomeController.class })
+@WebMvcTest(controllers = IncomeController.class)
+@WithMockAdmin
 @DisplayName("Income Controller REST Endpoint Testing With MockMvc")
 class IncomeControllerTest {
 
@@ -40,6 +40,7 @@ class IncomeControllerTest {
 
     @MockBean
     private IncomeService incomeService;
+
     private static final ObjectMapper mapper = new ObjectMapper();
     private static final List<IncomeResponse> incomes = new ArrayList<>();
     private static IncomeRequest incomeRequest;

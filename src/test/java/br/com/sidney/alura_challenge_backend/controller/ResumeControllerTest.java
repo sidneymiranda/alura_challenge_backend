@@ -3,6 +3,7 @@ package br.com.sidney.alura_challenge_backend.controller;
 import br.com.sidney.alura_challenge_backend.dto.CategoryResponse;
 import br.com.sidney.alura_challenge_backend.dto.ResumeResponse;
 import br.com.sidney.alura_challenge_backend.enums.Category;
+import br.com.sidney.alura_challenge_backend.mocks.WithMockAdmin;
 import br.com.sidney.alura_challenge_backend.service.ResumeService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
@@ -21,9 +21,10 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest
-@ContextConfiguration(classes = { ResumeController.class })
+@WebMvcTest(controllers = ResumeController.class)
+@WithMockAdmin
 @DisplayName("Resume Controller REST Endpoint Testing With MockMvc")
+
 class ResumeControllerTest {
 
     @Autowired

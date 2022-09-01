@@ -1,10 +1,10 @@
 package br.com.sidney.alura_challenge_backend.service;
 
+import br.com.sidney.alura_challenge_backend.dto.CategoryResponse;
 import br.com.sidney.alura_challenge_backend.dto.ResumeResponse;
 import br.com.sidney.alura_challenge_backend.enums.Category;
 import br.com.sidney.alura_challenge_backend.repository.ExpenseRepository;
 import br.com.sidney.alura_challenge_backend.repository.IncomeRepository;
-import br.com.sidney.alura_challenge_backend.dto.CategoryResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -17,7 +17,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class ResumeServiceTest {
-
     private ResumeService service;
     private final IncomeRepository incomeRepository;
     private final ExpenseRepository expenseRepository;

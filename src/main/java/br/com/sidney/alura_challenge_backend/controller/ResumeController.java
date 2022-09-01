@@ -5,6 +5,7 @@ import br.com.sidney.alura_challenge_backend.service.ResumeService;
 import br.com.sidney.alura_challenge_backend.validators.interfaces.Month;
 import br.com.sidney.alura_challenge_backend.validators.interfaces.Year;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -17,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 @Validated
 @RequestMapping("/api/v1/resume")
 public class ResumeController {
-
     private final ResumeService service;
 
     @Autowired
