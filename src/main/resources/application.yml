@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: dev
+    active: heroku
   jpa:
     open-in-view: false
 

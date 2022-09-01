@@ -1,1 +1,1 @@
-ALTER TABLE IF EXISTS public.income ADD COLUMN category varchar(20);
+ALTER TABLE IF EXISTS income ADD COLUMN category varchar(20);

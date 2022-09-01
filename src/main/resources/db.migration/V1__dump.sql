@@ -1,4 +1,4 @@
-CREATE TABLE public.expense (
+CREATE TABLE expense (
     id bigserial NOT NULL,
     "date" timestamp NOT NULL,
     description varchar(255) NOT NULL,
@@ -6,7 +6,7 @@ CREATE TABLE public.expense (
     CONSTRAINT expense_pkey PRIMARY KEY (id)
 );
 
-CREATE TABLE public.income (
+CREATE TABLE income (
    id bigserial NOT NULL,
    "date" timestamp NOT NULL,
    description varchar(255) NOT NULL,
