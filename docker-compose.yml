@@ -11,8 +11,6 @@ services:
       - POSTGRES_DB=account_manager
     ports:
       - 5432:5432
-    volumes:
-      - ./db-data:/var/lib/postgresql/data
     networks:
       - backend
   api:
@@ -29,7 +27,6 @@ services:
       - MAXIMUM_PULL_SIZE=5
       - HIBERNATE_DDL_AUTO=update
       - FORMAT_SQL=true
-#      - SPRING_PROFILES_ACTIVE=docker
       - FLYWAY_ENABLE=true
       - FLYWAY_CHECK_LOCATION=false
       - FLYWAY_LOCATIONS=classpath:db/migration
