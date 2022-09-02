@@ -6,4 +6,6 @@ WORKDIR /app
 
 COPY . .
 
+CMD cd app | ls
+
 ENTRYPOINT ["java", "-jar", "account-manager.jar"]
