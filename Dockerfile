@@ -6,4 +6,4 @@ WORKDIR /app
 
 COPY . .
 
-CMD ["java", "Dspring.profiles.active=${SPRING_PROFILE}", "-jar", "account-manager.jar"]
+CMD ["java", "-Dspring-boot.run.profiles=${SPRING_PROFILE}", "-jar", "account-manager.jar"]
