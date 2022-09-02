@@ -6,4 +6,4 @@ WORKDIR /app
 
 COPY . .
 
-ENTRYPOINT ["java", "-jar", "account-manager.jar"]
+CMD ["java", "Dspring.profiles.active=${SPRING_PROFILE}", "-jar", "account-manager.jar"]
