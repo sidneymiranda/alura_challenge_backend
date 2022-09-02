@@ -4,6 +4,6 @@ LABEL maintainer='Sidney Miranda <github/sidneymiranda>'
 
 WORKDIR /app
 
-COPY ./target/account-manager.jar .
+COPY . .
 
 ENTRYPOINT ["java", "-Dspring.profiles.active=prod", "-jar", "account-manager.jar"]
