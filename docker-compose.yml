@@ -3,12 +3,14 @@ version: '3.4'
 services:
   db:
     image: postgres:12-alpine
-    container_name: account_manager_db
+    container_name: db
     restart: always
-    env_file:
-      - ./database.dev.env
+    environment:
+      - POSTGRES_USER=account_manager_user
+      - POSTGRES_PASSWORD=account_manager_password
+      - POSTGRES_DB=account_manager
     ports:
-      - "5432:5432"
+      - 5432:5432
     volumes:
       - ./db-data:/var/lib/postgresql/data
     networks:
@@ -16,8 +18,22 @@ services:
   api:
     build: .
     container_name: account-manager-api
-    env_file:
-      - ./api.dev.env
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/account_manager
+      - DATASOURCE_USERNAME=account_manager_user
+      - DATASOURCE_PASSWORD=account_manager_password
+      - DATASOURCE_DRIVER_CLASSNAME=org.postgresql.Driver
+      - TIMEOUT=20000
+      - DATABASE_PLATFORM=org.hibernate.dialect.PostgreSQL9Dialect
+      - HIBERNATE_DIALECT=org.hibernate.dialect.PostgreSQL9Dialect
+      - MAXIMUM_PULL_SIZE=5
+      - HIBERNATE_DDL_AUTO=update
+      - FORMAT_SQL=true
+      - SPRING_PROFILES_ACTIVE=docker
+      - FLYWAY_ENABLE=true
+      - FLYWAY_CHECK_LOCATION=false
+      - FLYWAY_LOCATIONS=classpath:db/migration
+
     depends_on:
       - db
     networks:

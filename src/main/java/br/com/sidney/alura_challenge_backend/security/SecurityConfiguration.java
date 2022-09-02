@@ -14,7 +14,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.cors.CorsConfiguration;
 
 @EnableWebSecurity
-@Profile("prod")
+@Profile("{prod, docker}")
 @Slf4j
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     private final JwtUserDetailsService userDetailsService;
