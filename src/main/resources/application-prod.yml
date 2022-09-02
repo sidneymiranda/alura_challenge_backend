@@ -9,4 +9,6 @@ spring:
   profiles:
     active: ${SPRING_PROFILE}
 flyway:
-  locations: classpath=db/migration
+  enable: true
+  check-location: false
+  locations: classpath:db/migration
