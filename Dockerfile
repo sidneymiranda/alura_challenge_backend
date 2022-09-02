@@ -6,4 +6,4 @@ WORKDIR /app
 
 COPY ./target/account-manager.jar .
 
-ENTRYPOINT ["java", "-Dspring.profiles.active=heroku", "-jar", "account-manager.jar"]
+ENTRYPOINT ["java", "-Dspring.profiles.active=prod", "-jar", "account-manager.jar"]

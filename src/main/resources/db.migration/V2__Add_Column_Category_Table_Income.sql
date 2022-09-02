@@ -1,1 +1,0 @@
-ALTER TABLE IF EXISTS income ADD COLUMN category varchar(20);
