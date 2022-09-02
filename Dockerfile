@@ -6,6 +6,6 @@ ENV SPRING_PROFILES_ACTIVE=prod
 
 WORKDIR /app
 
-COPY /target/account-manager.jar /app/
+COPY target/account-manager.jar /app/
 
 ENTRYPOINT ["java","-jar", "account-manager.jar"]
