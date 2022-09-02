@@ -3,5 +3,7 @@ build:
     web: Dockerfile
     worker: worker/Dockerfile
 release:
+  command:
+    - mvn flyway:migrate
+    - mvn flyway:info
   image: worker
-  command: mvn flyway:migrate
