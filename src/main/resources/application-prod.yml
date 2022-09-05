@@ -8,5 +8,4 @@ spring:
     open-in-view: false
 flyway:
   enable: true
-  check-location: false
   locations: classpath:db/migration
