@@ -73,7 +73,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<Object> handleDateTimeParse(DataIntegrityViolationException ex) {
         return ResponseEntityBuilder.build(ApiError
                 .builder()
-                .message("Cannot parse date")
+                .message(ex.getLocalizedMessage())
                 .status(HttpStatus.BAD_REQUEST.value())
                 .timestamp(LocalDateTime.now())
                 .errors(Arrays.asList(ex.getMessage()))
