@@ -9,13 +9,13 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
-//@EnableWebSecurity
+@EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
+@Profile("dev")
 public class DevSecurityConfiguration {
 
     @Bean
-    @Profile("dev")
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain devFilterChain(HttpSecurity http) throws Exception {
         return http.authorizeRequests()
                 .antMatchers("/api/v1/**").permitAll()
                 .and()
