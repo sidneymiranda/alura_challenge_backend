@@ -33,7 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(controllers = ExpenseController.class)
 @WithMockAdmin
-@ActiveProfiles("dev")
+@ActiveProfiles("test")
 @DisplayName("Expense Controller REST Endpoint Testing With MockMvc")
 class ExpenseControllerTest {
 

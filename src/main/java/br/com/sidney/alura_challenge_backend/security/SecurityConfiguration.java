@@ -1,50 +1,56 @@
 package br.com.sidney.alura_challenge_backend.security;
 
-import br.com.sidney.alura_challenge_backend.service.JwtUserDetailsService;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
+import br.com.sidney.alura_challenge_backend.security.jwt.JWTConfigurer;
+import br.com.sidney.alura_challenge_backend.security.jwt.TokenProvider;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.web.cors.CorsConfiguration;
 
+@Configuration
 @EnableWebSecurity
-@Profile("{prod, docker}")
-@Slf4j
-public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
-    private final JwtUserDetailsService userDetailsService;
-    private final String secret;
+@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
+@Profile("prod, dev")
+public class SecurityConfiguration {
+    private TokenProvider tokenProvider;
 
-    public SecurityConfiguration(JwtUserDetailsService userDetailsService,
-                                 @Value("${jwt.secret}") String secret) {
-        this.userDetailsService = userDetailsService;
-        this.secret = secret;
+    public SecurityConfiguration(TokenProvider tokenProvider) {
+        this.tokenProvider = tokenProvider;
     }
 
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetailsService).passwordEncoder(new BCryptPasswordEncoder());
+    private JWTConfigurer jwtSecurityConfigurerAdapter() {
+        return new JWTConfigurer(tokenProvider);
     }
 
-    @Override
-    public void configure(HttpSecurity http) throws Exception {
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.cors().configurationSource(request -> new CorsConfiguration().applyPermitDefaultValues())
-                .and().csrf().disable()
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
+                .csrf().disable()
                 .authorizeRequests()
-                .antMatchers(HttpMethod.POST, "/login").permitAll()
-                .antMatchers(HttpMethod.POST, "/api/v1/roles", "/api/v1/users").hasRole("ADMIN")
+                .antMatchers(HttpMethod.POST, "/api/auth").permitAll()
+                .antMatchers(HttpMethod.POST,"/api/v1/roles", "/api/v1/users")
+                    .hasAuthority("ROLE_SUPER_ADMIN")
                 .anyRequest()
-                .authenticated()
-                .and()
-                .addFilter(new JwtAuthenticationFilter(authenticationManager(), secret))
-                .addFilter(new JwtAuthorizationFilter(authenticationManager(), userDetailsService, secret));
+                    .authenticated()
+                    .and()
+                .httpBasic(Customizer.withDefaults())
+                .apply(jwtSecurityConfigurerAdapter());
+        return http.build();
     }
 }

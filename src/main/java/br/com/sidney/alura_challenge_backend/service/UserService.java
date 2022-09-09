@@ -29,16 +29,18 @@ public class UserService {
             throw new ValidationException("Username already exists, try again!");
         }
 
-        final Set<Role> roles = user.getRoles().stream()
-                .map(role -> authorityRepository.findByName("ROLE_" + role.getName().toUpperCase())
-                        .orElseThrow(() -> new ResourceNotFoundException("Authority not found")))
-                .collect(Collectors.toSet());
-
-        User newUser = new User(user);
+        User newUser = new User();
         newUser.setPassword(new BCryptPasswordEncoder().encode(user.getPassword()));
-        newUser.setRoles(roles);
+        newUser.setRoles(mapAuthority(user));
         User savedUser = userRepository.save(newUser);
 
         return new UserResponse(savedUser);
+    }
+
+    private Set<Role> mapAuthority(UserRequest user) {
+        return user.getRoles().stream()
+                .map(role -> authorityRepository.findByName("ROLE_" + role.getName().toUpperCase())
+                        .orElseThrow(() -> new ResourceNotFoundException("Authority not found")))
+                .collect(Collectors.toSet());
     }
 }

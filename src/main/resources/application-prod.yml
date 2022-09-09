@@ -6,6 +6,8 @@ spring:
     hibernate:
       ddl-auto: none
     open-in-view: false
-flyway:
-  enable: true
-  locations: classpath:db/migration
+  flyway:
+    url: ${DATABASE_URL}
+    user: $DATABASE_URL["user"]
+    password: $DATABASE_URL["pass"]
+    locations: classpath:db/migration

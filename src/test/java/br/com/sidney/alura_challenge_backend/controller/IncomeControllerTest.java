@@ -33,7 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(controllers = IncomeController.class)
 @WithMockAdmin
-@ActiveProfiles("dev")
+@ActiveProfiles("test")
 @DisplayName("Income Controller REST Endpoint Testing With MockMvc")
 class IncomeControllerTest {
 

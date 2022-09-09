@@ -8,10 +8,6 @@ import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
 
-import java.util.Set;
-
-import static br.com.sidney.alura_challenge_backend.security.SecurityConstants.ROLE;
-
 @Entity
 @NoArgsConstructor
 @Data
@@ -19,6 +15,7 @@ import static br.com.sidney.alura_challenge_backend.security.SecurityConstants.R
 public class Role implements GrantedAuthority {
 
     private static final long serialVersionUID = 1L;
+    private static String ROLE = "ROLE_";
 
     public Role(RoleRequest role) {
         this.name = ROLE + role.getName().toUpperCase();
