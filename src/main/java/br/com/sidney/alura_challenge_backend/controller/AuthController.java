@@ -30,9 +30,7 @@ public class AuthController {
     @PostMapping("/auth")
     public ResponseEntity<JwtToken> login(@RequestBody AuthDto authDto) {
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                authDto.getUsername(),
-                authDto.getPassword()
-        );
+                authDto.getUsername(), authDto.getPassword());
 
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
 

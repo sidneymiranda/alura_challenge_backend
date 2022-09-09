@@ -7,9 +7,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class JwtToken {
     private String idToken;
+    private String type;
 
     public JwtToken(String idToken) {
         this.idToken = idToken;
+        this.type = "Bearer";
     }
 
     @JsonProperty("id_token")
@@ -17,7 +19,7 @@ public class JwtToken {
         return idToken;
     }
 
-    void setIdToken(String idToken) {
-        this.idToken = idToken;
+    public String getType() {
+        return type;
     }
 }

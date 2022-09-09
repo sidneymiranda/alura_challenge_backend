@@ -10,7 +10,7 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
@@ -18,7 +18,7 @@ import org.springframework.web.cors.CorsConfiguration;
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
-@Profile("prod")
+@Profile("{prod, dev}")
 public class SecurityConfiguration {
     private TokenProvider tokenProvider;
 
@@ -26,15 +26,14 @@ public class SecurityConfiguration {
         this.tokenProvider = tokenProvider;
     }
 
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+    }
+
     private JWTConfigurer jwtSecurityConfigurerAdapter() {
         return new JWTConfigurer(tokenProvider);
     }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -42,9 +41,10 @@ public class SecurityConfiguration {
                 .and()
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers(HttpMethod.POST, "/api/auth").permitAll()
-                .antMatchers(HttpMethod.POST,"/api/v1/roles", "/api/v1/users")
-                    .hasAuthority("ROLE_SUPER_ADMIN")
+                .antMatchers("/api/auth")
+                    .permitAll()
+                .antMatchers(HttpMethod.POST,"/api/v1/roles","/api/v1/users")
+                    .hasAuthority("SUPER_ADMIN")
                 .anyRequest()
                     .authenticated()
                     .and()

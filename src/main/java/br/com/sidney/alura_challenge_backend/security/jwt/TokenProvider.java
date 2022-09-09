@@ -7,6 +7,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -24,9 +25,10 @@ import java.util.stream.Collectors;
 @Component
 @Slf4j
 public class TokenProvider {
-    private final Key key;
-    private final JwtParser jwtParser;
-    private final String BASE_64_SECRET = "YWNjb3VudC1tYW5hZ2VyLWFwaVNpZG5leU1pcmFuZGE=";
+    private Key key;
+    private JwtParser jwtParser;
+
+    private String BASE_64_SECRET = "RjKP2Lae6Q/o4YN0BVh7/QdwUYp0LxfujuqE+tt46EB7yVR37ln9uLm/oanDpjVnXTvhdaLunPFMLzuM6JYaJV/ASAfA1RJxMfnEadsIvjr+PyVDIEP5qfw9et8Sw7WYpOoMcAOyTXHLcKh8jP8XkMJXnRNH1DpQRoYx/rbChRU+iU3FbpJQIryrf6gvseOIuofxgfy6lnTkK/8yIJy4axYvmI1NbcHeJdpS9A==";
 
     public TokenProvider() {
         byte[] keyBytes = Decoders.BASE64.decode(BASE_64_SECRET);
