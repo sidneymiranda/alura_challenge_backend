@@ -1,6 +1,6 @@
 -- DROP SCHEMA public;
 
-CREATE SCHEMA public AUTHORIZATION postgres;
+-- CREATE SCHEMA public AUTHORIZATION account_manager_user;
 
 -- DROP SEQUENCE public.expense_id_seq;
 
@@ -57,7 +57,7 @@ CREATE TABLE public.expense (
 
 -- Drop table
 
--- DROP TABLE public.flyway_schema_history;
+DROP TABLE public.flyway_schema_history;
 
 CREATE TABLE public.flyway_schema_history (
                                               installed_rank int4 NOT NULL,

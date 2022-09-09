@@ -12,8 +12,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Profile;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -32,8 +33,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = ExpenseController.class)
-@WithMockAdmin
 @ActiveProfiles("dev")
+@WithMockAdmin
 @DisplayName("Expense Controller REST Endpoint Testing With MockMvc")
 class ExpenseControllerTest {
 
@@ -95,6 +96,8 @@ class ExpenseControllerTest {
         ExpenseResponse response = expenses.get(1);
         when(expenseService.register(any(ExpenseRequest.class))).thenReturn(response);
         mockMvc.perform(post("/api/v1/expenses")
+                        .with(SecurityMockMvcRequestPostProcessors.user("admin").roles("SUPER_USER"))
+                        .with(SecurityMockMvcRequestPostProcessors.csrf())
                         .content(mapper.writeValueAsString(expenseRequest))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -107,6 +110,8 @@ class ExpenseControllerTest {
     @DisplayName("Shouldn't create a new expense and return the HTTP status code BAD REQUEST (400)")
     void whenDescriptionExpenseIsNull_thenTBadRequest() throws Exception {
        mockMvc.perform(post("/api/v1/expenses")
+                       .with(SecurityMockMvcRequestPostProcessors.user("admin").roles("SUPER_USER"))
+                       .with(SecurityMockMvcRequestPostProcessors.csrf())
                         .content(mapper.writeValueAsString(expenseRequest.builder().description(null).build()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -117,6 +122,8 @@ class ExpenseControllerTest {
     @DisplayName("Shouldn't create a new expense and return the HTTP status code BAD REQUEST (400)")
     void whenValueExpenseIsNull_thenTBadRequest() throws Exception {
        mockMvc.perform(post("/api/v1/expenses")
+                       .with(SecurityMockMvcRequestPostProcessors.user("admin").roles("SUPER_USER"))
+                       .with(SecurityMockMvcRequestPostProcessors.csrf())
                         .content(mapper.writeValueAsString(expenseRequest.builder().value(null).build()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -127,6 +134,8 @@ class ExpenseControllerTest {
     @DisplayName("Shouldn't create a new expense and return the HTTP status code BAD REQUEST (400)")
     void whenDateExpenseIsNull_thenTBadRequest() throws Exception {
        mockMvc.perform(post("/api/v1/expenses")
+                       .with(SecurityMockMvcRequestPostProcessors.user("admin").roles("SUPER_USER"))
+                       .with(SecurityMockMvcRequestPostProcessors.csrf())
                         .content(mapper.writeValueAsString(expenseRequest.builder().date(null).build()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -175,11 +184,14 @@ class ExpenseControllerTest {
     void deleteById() throws Exception {
         doNothing().when(expenseService).delete("1");
 
-        mockMvc.perform(delete("/api/v1/expenses/{id}", "1"))
+        mockMvc.perform(delete("/api/v1/expenses/{id}", "1")
+                        .with(SecurityMockMvcRequestPostProcessors.user("admin").roles("SUPER_USER"))
+                        .with(SecurityMockMvcRequestPostProcessors.csrf()))
                 .andExpect(status().isNoContent());
     }
 
     @Test
+    @WithMockUser(username = "admin", roles = {"SUPER_ADMIN"})
     @DisplayName("Should update expense")
     void update() throws Exception {
         expenseRequest = ExpenseRequest.builder()
@@ -197,6 +209,8 @@ class ExpenseControllerTest {
         when(expenseService.update("1", expenseRequest)).thenReturn(response);
 
         mockMvc.perform(put("/api/v1/expenses/{id}", "1")
+                .with(SecurityMockMvcRequestPostProcessors.user("admin").roles("SUPER_USER"))
+                .with(SecurityMockMvcRequestPostProcessors.csrf())
                 .content(mapper.writeValueAsString(expenseRequest))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
@@ -227,6 +241,8 @@ class ExpenseControllerTest {
     @DisplayName("Should return the HTTP status code OK (400)")
     void whenSaveWithIncorrectDate_thenBadRequest() throws Exception {
         mockMvc.perform(post("/api/v1/expenses")
+                        .with(SecurityMockMvcRequestPostProcessors.user("admin").roles("SUPER_ADMIN"))
+                        .with(SecurityMockMvcRequestPostProcessors.csrf())
                         .content(mapper.writeValueAsString(ExpenseRequest.builder()
                                 .description("iFood")
                                 .value("95.50")

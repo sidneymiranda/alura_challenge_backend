@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -93,6 +94,8 @@ class IncomeControllerTest {
         IncomeResponse response = incomes.get(1);
         when(incomeService.register(any(IncomeRequest.class))).thenReturn(response);
         mockMvc.perform(post("/api/v1/incomes")
+                        .with(SecurityMockMvcRequestPostProcessors.user("admin").roles("SUPER_USER"))
+                        .with(SecurityMockMvcRequestPostProcessors.csrf())
                         .content(mapper.writeValueAsString(IncomeRequest.builder()
                                 .description("Salary")
                                 .value("985.56")
@@ -109,6 +112,8 @@ class IncomeControllerTest {
     @DisplayName("Shouldn't create a new income and return the HTTP status code BAD REQUEST (400)")
     void whenDescriptionIncomeIsNull_thenBadRequest() throws Exception {
         mockMvc.perform(post("/api/v1/incomes")
+                        .with(SecurityMockMvcRequestPostProcessors.user("admin").roles("SUPER_USER"))
+                        .with(SecurityMockMvcRequestPostProcessors.csrf())
                         .content(mapper.writeValueAsString(incomeRequest.builder().description(null).build()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -119,6 +124,8 @@ class IncomeControllerTest {
     @DisplayName("Shouldn't create a new income and return the HTTP status code BAD REQUEST (400)")
     void whenValueIncomeIsNull_thenBadRequest() throws Exception {
        mockMvc.perform(post("/api/v1/incomes")
+                       .with(SecurityMockMvcRequestPostProcessors.user("admin").roles("SUPER_USER"))
+                       .with(SecurityMockMvcRequestPostProcessors.csrf())
                         .content(mapper.writeValueAsString(incomeRequest.builder().value(null).build()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -129,6 +136,8 @@ class IncomeControllerTest {
     @DisplayName("Shouldn't create a new income and return the HTTP status code BAD REQUEST (400)")
     void whenDateIncomeIsNull_thenBadRequest() throws Exception {
         mockMvc.perform(post("/api/v1/incomes")
+                        .with(SecurityMockMvcRequestPostProcessors.user("admin").roles("SUPER_USER"))
+                        .with(SecurityMockMvcRequestPostProcessors.csrf())
                         .content(mapper.writeValueAsString(incomeRequest.builder().date(null).build()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -194,7 +203,9 @@ class IncomeControllerTest {
     void deleteById() throws Exception {
         doNothing().when(incomeService).delete("1");
 
-        mockMvc.perform(delete("/api/v1/incomes/{id}", "1"))
+        mockMvc.perform(delete("/api/v1/incomes/{id}", "1")
+                .with(SecurityMockMvcRequestPostProcessors.user("admin").roles("SUPER_USER"))
+                .with(SecurityMockMvcRequestPostProcessors.csrf()))
                 .andExpect(status().isNoContent());
     }
 
@@ -216,6 +227,8 @@ class IncomeControllerTest {
         when(incomeService.update("1", incomeRequest)).thenReturn(response);
 
         mockMvc.perform(put("/api/v1/incomes/{id}", "1")
+                .with(SecurityMockMvcRequestPostProcessors.user("admin").roles("SUPER_USER"))
+                .with(SecurityMockMvcRequestPostProcessors.csrf())
                 .content(mapper.writeValueAsString(incomeRequest))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
@@ -229,6 +242,8 @@ class IncomeControllerTest {
     @DisplayName("Should return the HTTP status code OK (400)")
     void whenSaveWithIncorrectDate_thenBadRequest() throws Exception {
         mockMvc.perform(post("/api/v1/incomes")
+                        .with(SecurityMockMvcRequestPostProcessors.user("admin").roles("SUPER_USER"))
+                        .with(SecurityMockMvcRequestPostProcessors.csrf())
                         .content(mapper.writeValueAsString(IncomeRequest.builder()
                                 .description("Salary")
                                 .value("3400.00")

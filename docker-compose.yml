@@ -16,28 +16,26 @@ services:
   api:
     build: .
     container_name: account-manager-api
-    environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/account_manager
-      - DATASOURCE_USERNAME=account_manager_user
-      - DATASOURCE_PASSWORD=account_manager_password
-      - DATASOURCE_DRIVER_CLASSNAME=org.postgresql.Driver
-      - TIMEOUT=20000
-      - DATABASE_PLATFORM=org.hibernate.dialect.PostgreSQL9Dialect
-      - HIBERNATE_DIALECT=org.hibernate.dialect.PostgreSQL9Dialect
-      - MAXIMUM_PULL_SIZE=5
-      - HIBERNATE_DDL_AUTO=update
-      - FORMAT_SQL=true
-      - FLYWAY_ENABLE=true
-      - FLYWAY_CHECK_LOCATION=false
-      - FLYWAY_LOCATIONS=classpath:db/migration
+#    environment:
+#      - SPRING_PROFILES_ACTIVE=dev
+#      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/account_manager
+#      - DATASOURCE_USERNAME=account_manager_user
+#      - DATASOURCE_PASSWORD=account_manager_password
+#      - DATASOURCE_DRIVER_CLASSNAME=org.postgresql.Driver
+#      - TIMEOUT=20000
+#      - DATABASE_PLATFORM=org.hibernate.dialect.PostgreSQL9Dialect
+#      - HIBERNATE_DIALECT=org.hibernate.dialect.PostgreSQL9Dialect
+#      - MAXIMUM_PULL_SIZE=5
+#      - HIBERNATE_DDL_AUTO=update
+#      - FORMAT_SQL=true
+#      - FLYWAY_ENABLE=true
+#      - FLYWAY_CHECK_LOCATION=false
+#      - FLYWAY_LOCATIONS=classpath:db/migration
 
     depends_on:
       - db
     networks:
       - backend
-
-volumes:
-  db-data:
 
 networks:
   backend:
