@@ -8,6 +8,6 @@ spring:
     open-in-view: false
   flyway:
     url: ${DATABASE_URL}
-    user: $DATABASE_URL["user"]
-    password: $DATABASE_URL["pass"]
+    user: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
     locations: classpath:db/migration
