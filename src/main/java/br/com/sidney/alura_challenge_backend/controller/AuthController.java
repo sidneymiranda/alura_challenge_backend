@@ -4,6 +4,7 @@ import br.com.sidney.alura_challenge_backend.dto.AuthDto;
 import br.com.sidney.alura_challenge_backend.dto.JwtToken;
 import br.com.sidney.alura_challenge_backend.security.jwt.JwtFilter;
 import br.com.sidney.alura_challenge_backend.security.jwt.TokenProvider;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,14 +19,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api")
+@RequiredArgsConstructor
 public class AuthController {
     private final TokenProvider tokenProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
-
-    public AuthController(TokenProvider tokenProvider, AuthenticationManagerBuilder authenticationManagerBuilder) {
-        this.tokenProvider = tokenProvider;
-        this.authenticationManagerBuilder = authenticationManagerBuilder;
-    }
 
     @PostMapping("/auth")
     public ResponseEntity<JwtToken> login(@RequestBody AuthDto authDto) {

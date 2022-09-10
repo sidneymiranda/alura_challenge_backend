@@ -8,6 +8,7 @@ import br.com.sidney.alura_challenge_backend.model.Role;
 import br.com.sidney.alura_challenge_backend.model.User;
 import br.com.sidney.alura_challenge_backend.repository.AuthorityRepository;
 import br.com.sidney.alura_challenge_backend.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -17,14 +18,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
     private final AuthorityRepository authorityRepository;
-
-    public UserService(UserRepository userRepository, AuthorityRepository authorityRepository) {
-        this.userRepository = userRepository;
-        this.authorityRepository = authorityRepository;
-    }
 
     public UserResponse save(UserRequest user) {
         Optional<User> found = userRepository.findByUsername(user.getUsername());

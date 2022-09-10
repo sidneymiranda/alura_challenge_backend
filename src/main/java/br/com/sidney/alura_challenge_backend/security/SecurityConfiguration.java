@@ -18,9 +18,9 @@ import org.springframework.web.cors.CorsConfiguration;
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
-@Profile("{prod, dev}")
+@Profile("!test")
 public class SecurityConfiguration {
-    private TokenProvider tokenProvider;
+    private final TokenProvider tokenProvider;
 
     public SecurityConfiguration(TokenProvider tokenProvider) {
         this.tokenProvider = tokenProvider;

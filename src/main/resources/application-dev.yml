@@ -11,7 +11,7 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQL9Dialect
     show-sql: true
     hibernate:
-      ddl-auto: none
+      ddl-auto: validate
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQL9Dialect
@@ -21,3 +21,8 @@ spring:
     user: account_manager_user
     password: account_manager_password
     locations: classpath:db/migration
+logging:
+  level:
+    web: info
+server:
+  port: 8080
