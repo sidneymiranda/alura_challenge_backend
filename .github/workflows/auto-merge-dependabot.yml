@@ -1,0 +1,48 @@
+# .github/workflows/auto-merge-dependabot.yml
+name: Auto Merge Dependabot Updates
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+
+jobs:
+  auto-merge:
+    if: github.actor == 'dependabot[bot]' # Somente PRs abertas pelo Dependabot
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin' # Altere para a versão do JDK desejada
+
+    - name: Build and test with Maven
+      run: mvn clean verify
+
+    - name: Approve PR
+      if: success()
+      run: gh pr review ${{ github.event.pull_request.number }} --approve
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Auto-merge Dependabot PR
+      if: success()
+      uses: "actions/github-script@v6"
+      with:
+        script: |
+          const pull_request = context.payload.pull_request;
+          if (pull_request.user.login === "dependabot[bot]" && pull_request.labels.some(label => label.name === "dependencies")) {
+            await github.pulls.merge({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: pull_request.number,
+              merge_method: "squash" # Método de merge: "squash", "rebase" ou "merge"
+            });
+          }
